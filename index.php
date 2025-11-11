@@ -153,6 +153,8 @@
                     <li class="nav-item"><a class="nav-link" href="#profil">Profil</a></li>
                     <li class="nav-item"><a class="nav-link" href="#fasilitas">Fasilitas</a></li>
                     <li class="nav-item"><a class="nav-link" href="#kontak">Kontak</a></li>
+                    <li class="nav-item"><a class="nav-link" href="panduan.html">Panduan</a></li>
+
                 </ul>
             </div>
         </div>
