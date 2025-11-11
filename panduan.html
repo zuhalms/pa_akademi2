@@ -1,0 +1,2248 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panduan Lengkap SMART-BA - UIN Palopo</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.7;
+            color: #1a1a1a;
+            background: #ffffff;
+            font-size: 11pt;
+        }
+
+        .container {
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 20mm;
+        }
+
+        /* Header Cover - White Background */
+        .cover-page {
+            text-align: center;
+            padding: 80px 40px;
+            background: #ffffff;
+            border: 5px solid #00A86B;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            page-break-after: always;
+            box-shadow: 0 4px 20px rgba(0,168,107,0.15);
+        }
+
+        .cover-page .logo-container {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 30px;
+            border: 4px solid #00A86B;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+        }
+
+        .cover-page .logo-container img {
+            width: 100px;
+            height: 100px;
+        }
+
+        .cover-page h1 {
+            font-size: 42pt;
+            font-weight: 800;
+            margin-bottom: 15px;
+            color: #00A86B;
+            text-shadow: none;
+        }
+
+        .cover-page .subtitle {
+            font-size: 18pt;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        .cover-page .institution {
+            font-size: 16pt;
+            font-weight: 600;
+            margin-top: 30px;
+            padding: 15px 30px;
+            background: #e8f5f1;
+            border: 2px solid #00A86B;
+            border-radius: 10px;
+            display: inline-block;
+            color: #00A86B;
+        }
+
+        .cover-page .version {
+            font-size: 10pt;
+            margin-top: 40px;
+            color: #6c757d;
+        }
+
+
+        /* Table of Contents */
+        .toc {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            page-break-after: always;
+        }
+
+        .toc h2 {
+            color: #00A86B;
+            font-size: 24pt;
+            margin-bottom: 25px;
+            border-bottom: 3px solid #00A86B;
+            padding-bottom: 10px;
+        }
+
+        .toc-section {
+            margin-bottom: 20px;
+        }
+
+        .toc-section h3 {
+            color: #008F5A;
+            font-size: 14pt;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .toc-item {
+            padding: 8px 0 8px 20px;
+            border-left: 3px solid #e9ecef;
+            margin-bottom: 5px;
+            font-size: 11pt;
+        }
+
+        /* Typography */
+        h1 {
+            color: #00A86B;
+            font-size: 28pt;
+            font-weight: 800;
+            margin: 40px 0 20px 0;
+            page-break-after: avoid;
+        }
+
+        h2 {
+            color: #008F5A;
+            font-size: 20pt;
+            font-weight: 700;
+            margin: 35px 0 18px 0;
+            page-break-after: avoid;
+            border-left: 5px solid #00A86B;
+            padding-left: 15px;
+        }
+
+        h3 {
+            color: #343a40;
+            font-size: 15pt;
+            font-weight: 700;
+            margin: 25px 0 12px 0;
+            page-break-after: avoid;
+        }
+
+        h4 {
+            color: #495057;
+            font-size: 12pt;
+            font-weight: 600;
+            margin: 20px 0 10px 0;
+        }
+
+        p {
+            margin-bottom: 12px;
+            text-align: justify;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin-bottom: 15px;
+            padding-left: 30px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        /* Boxes */
+        .info-box {
+            background: #e8f5f1;
+            border-left: 5px solid #00A86B;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            page-break-inside: avoid;
+        }
+
+        .info-box h4 {
+            color: #00A86B;
+            margin-top: 0;
+            font-size: 13pt;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            page-break-inside: avoid;
+        }
+
+        .warning-box h4 {
+            color: #856404;
+            margin-top: 0;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            page-break-inside: avoid;
+        }
+
+        .success-box h4 {
+            color: #155724;
+            margin-top: 0;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 10pt;
+            page-break-inside: avoid;
+        }
+
+        th {
+            background: #00A86B;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        /* Steps */
+        .step-list {
+            counter-reset: step-counter;
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .step-list li {
+            counter-increment: step-counter;
+            margin-bottom: 20px;
+            padding-left: 60px;
+            position: relative;
+        }
+
+        .step-list li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: #00A86B;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16pt;
+        }
+
+        /* Feature Cards */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-top: 4px solid #00A86B;
+            page-break-inside: avoid;
+        }
+
+        .feature-card h4 {
+            color: #00A86B;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        /* Icons */
+        .icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        /* Code blocks */
+        code {
+            background: #f1f3f5;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 10pt;
+            color: #d63384;
+        }
+
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #00A86B;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        /* Status badges */
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 9pt;
+            font-weight: 600;
+            margin: 0 5px;
+        }
+
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        .badge-danger { background: #f8d7da; color: #721c24; }
+        .badge-info { background: #d1ecf1; color: #0c5460; }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            border-top: 2px solid #e9ecef;
+            color: #6c757d;
+            font-size: 9pt;
+        }
+
+        /* Print styles */
+        @media print {
+            body { 
+                font-size: 10pt;
+                line-height: 1.6;
+            }
+            .container { 
+                max-width: 100%; 
+                padding: 0;
+            }
+            h1 { page-break-before: always; }
+            h1:first-of-type { page-break-before: avoid; }
+            .cover-page, .toc { page-break-after: always; }
+            .info-box, .warning-box, .success-box, .feature-card, table { page-break-inside: avoid; }
+        }
+
+        /* Checkmarks */
+        .checkmark {
+            color: #28a745;
+            font-weight: 700;
+            margin-right: 5px;
+        }
+
+        /* Highlight */
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        /* Section divider */
+        .section-divider {
+            height: 3px;
+            background: linear-gradient(to right, #00A86B, #008F5A, transparent);
+            margin: 40px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+                <!-- COVER PAGE -->
+        <div class="cover-page">
+            <!-- Logo UIN Palopo (tanpa bundar) -->
+            <div style="margin-bottom: 40px;">
+                <!-- Jika punya file logo, gunakan ini: -->
+                <!-- <img src="assets/logo_uin.png" alt="Logo UIN Palopo" style="width: 120px; height: 120px;"> -->
+                
+                <!-- Atau gunakan teks saja: -->
+                <div style="font-size: 60pt; color: #00A86B; font-weight: 800; letter-spacing: 2px;">
+                    SMART-BA
+                </div>
+            </div>
+            
+            <h1>PANDUAN LENGKAP<br>SISTEM SMART-BA</h1>
+            <div class="subtitle">Sistem Pembimbingan Akademik Digital</div>
+            
+            <div class="institution">
+                Fakultas Syariah<br>
+                Universitas Islam Negeri Palopo
+            </div>
+            
+            <div class="version">Created by Zuhal Samas | November 2025</div>
+        </div>
+
+
+        <!-- TABLE OF CONTENTS -->
+        <div class="toc">
+            <h2>📋 DAFTAR ISI</h2>
+            
+            <div class="toc-section">
+                <h3>BAGIAN I: PANDUAN UMUM</h3>
+                <div class="toc-item">1. Tentang Sistem SMART-BA</div>
+                <div class="toc-item">2. Akses & Login</div>
+                <div class="toc-item">3. Navigasi Dashboard</div>
+            </div>
+
+            <div class="toc-section">
+                <h3>BAGIAN II: PANDUAN UNTUK MAHASISWA</h3>
+                <div class="toc-item">4. Dashboard Mahasiswa</div>
+                <div class="toc-item">5. Mengelola Profil</div>
+                <div class="toc-item">6. Input Riwayat Akademik</div>
+                <div class="toc-item">7. Konsultasi Judul Penelitian</div>
+                <div class="toc-item">8. Upload Dokumen</div>
+                <div class="toc-item">9. Logbook Bimbingan</div>
+                <div class="toc-item">10. Evaluasi Dosen PA</div>
+                <div class="toc-item">11. Melihat & Mencetak Laporan</div>
+            </div>
+
+            <div class="toc-section">
+                <h3>BAGIAN III: PANDUAN UNTUK DOSEN PA</h3>
+                <div class="toc-item">12. Dashboard Dosen PA</div>
+                <div class="toc-item">13. Mengelola Profil Dosen</div>
+                <div class="toc-item">14. Melihat Detail Mahasiswa Bimbingan</div>
+                <div class="toc-item">15. Approval KRS Mahasiswa</div>
+                <div class="toc-item">16. Menanggapi Konsultasi Judul</div>
+                <div class="toc-item">17. Menambah Logbook Bimbingan</div>
+                <div class="toc-item">18. Evaluasi Soft Skill Mahasiswa</div>
+                <div class="toc-item">19. Input Nilai Bermasalah</div>
+                <div class="toc-item">20. Mencetak Berbagai Laporan</div>
+            </div>
+
+            <div class="toc-section">
+                <h3>BAGIAN IV: TIPS & TROUBLESHOOTING</h3>
+                <div class="toc-item">21. FAQ (Frequently Asked Questions)</div>
+                <div class="toc-item">22. Troubleshooting</div>
+                <div class="toc-item">23. Kontak Support</div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- BAGIAN I: PANDUAN UMUM -->
+        <!-- ========================================== -->
+
+        <h1>BAGIAN I: PANDUAN UMUM</h1>
+
+        <h2>1. Tentang Sistem SMART-BA</h2>
+
+        <p><strong>SMART-BA (Smart Bimbingan Akademik)</strong> adalah sistem informasi pembimbingan akademik berbasis web yang dirancang untuk memfasilitasi proses bimbingan akademik antara mahasiswa dan dosen pembimbing akademik (PA) di Fakultas Syariah UIN Palopo.</p>
+
+        <div class="info-box">
+            <h4>🎯 Tujuan Sistem</h4>
+            <ul>
+                <li><span class="checkmark">✓</span> Mendigitalkan proses bimbingan akademik (paperless)</li>
+                <li><span class="checkmark">✓</span> Memudahkan monitoring perkembangan akademik mahasiswa</li>
+                <li><span class="checkmark">✓</span> Menyediakan dokumentasi lengkap riwayat bimbingan</li>
+                <li><span class="checkmark">✓</span> Meningkatkan efisiensi komunikasi dosen-mahasiswa</li>
+                <li><span class="checkmark">✓</span> Mendukung Smart & Green Campus Initiative</li>
+            </ul>
+        </div>
+
+        <h3>Fitur Utama Sistem</h3>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h4>📚 Logbook Digital</h4>
+                <p>Pencatatan setiap sesi bimbingan secara online. Baik dosen maupun mahasiswa dapat menambahkan catatan kapan saja.</p>
+            </div>
+            <div class="feature-card">
+                <h4>✅ Pelacak Pencapaian</h4>
+                <p>Visualisasi kemajuan studi dari Seminar Proposal hingga Yudisium dengan checklist interaktif.</p>
+            </div>
+            <div class="feature-card">
+                <h4>📁 Upload Dokumen</h4>
+                <p>Bagikan file penting seperti draft KRS atau revisi skripsi dengan mudah langsung dalam sistem.</p>
+            </div>
+            <div class="feature-card">
+                <h4>⭐ Evaluasi Dua Arah</h4>
+                <p>Dosen dapat mengevaluasi soft skill mahasiswa, dan mahasiswa dapat memberi umpan balik kinerja dosen PA.</p>
+            </div>
+        </div>
+
+        <h3>Statistik Sistem</h3>
+
+        <table>
+            <tr>
+                <th>Komponen</th>
+                <th>Jumlah</th>
+                <th>Keterangan</th>
+            </tr>
+            <tr>
+                <td>Total Files</td>
+                <td>33+ Files</td>
+                <td>PHP, HTML, CSS</td>
+            </tr>
+            <tr>
+                <td>Database Tables</td>
+                <td>13+ Tables</td>
+                <td>Relational database</td>
+            </tr>
+            <tr>
+                <td>User Roles</td>
+                <td>3 Roles</td>
+                <td>Dosen, Mahasiswa, Admin</td>
+            </tr>
+            <tr>
+                <td>Jenis Laporan</td>
+                <td>7 Reports</td>
+                <td>PDF & HTML format</td>
+            </tr>
+            <tr>
+                <td>Fitur Utama</td>
+                <td>20+ Features</td>
+                <td>Lengkap & terintegrasi</td>
+            </tr>
+        </table>
+
+        <div class="section-divider"></div>
+
+        <h2>2. Akses & Login</h2>
+
+        <h3>URL Akses Sistem</h3>
+
+        <pre><code>https://pa-uin.infinityfreeapp.com/</code></pre>
+
+        <h3>Halaman Login</h3>
+
+        <p>Sistem memiliki 2 halaman login terpisah berdasarkan role:</p>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h4>🎓 Login Mahasiswa</h4>
+                <ul>
+                    <li><strong>URL:</strong> <code>login_mahasiswa.php</code></li>
+                    <li><strong>Username:</strong> NIM Anda</li>
+                    <li><strong>Contoh:</strong> 2001234567</li>
+                    <li><strong>Password:</strong> Diberikan admin</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <h4>👨‍🏫 Login Dosen PA</h4>
+                <ul>
+                    <li><strong>URL:</strong> <code>login_dosen.php</code></li>
+                    <li><strong>Username:</strong> ID Dosen / NIP</li>
+                    <li><strong>Contoh:</strong> 198501012010011001</li>
+                    <li><strong>Password:</strong> Diberikan admin</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>Langkah-Langkah Login</h3>
+
+        <ol class="step-list">
+            <li>
+                <strong>Buka website SMART-BA</strong><br>
+                Akses URL sistem melalui browser (Chrome, Firefox, Edge)
+            </li>
+            <li>
+                <strong>Pilih role Anda</strong><br>
+                Klik tombol "Login Mahasiswa" atau "Login Dosen"
+            </li>
+            <li>
+                <strong>Masukkan kredensial</strong><br>
+                Input username (NIM/NIP) dan password dengan benar
+            </li>
+            <li>
+                <strong>Klik Login</strong><br>
+                Tekan tombol "Login" atau "Masuk"
+            </li>
+            <li>
+                <strong>Akses dashboard</strong><br>
+                Jika berhasil, Anda akan diarahkan ke dashboard sesuai role
+            </li>
+        </ol>
+
+        <div class="warning-box">
+            <h4>⚠️ Catatan Penting Keamanan</h4>
+            <ul>
+                <li>Jangan share password Anda kepada orang lain</li>
+                <li>Jika lupa password, hubungi admin sistem</li>
+                <li>Pastikan <strong>logout</strong> setelah selesai menggunakan sistem</li>
+                <li>Gunakan password yang kuat (kombinasi huruf, angka, simbol)</li>
+                <li>Jangan login di komputer publik tanpa logout</li>
+            </ul>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h2>3. Navigasi Dashboard</h2>
+
+        <h3>Menu Utama Mahasiswa</h3>
+
+        <table>
+            <tr>
+                <th>Menu</th>
+                <th>Fungsi</th>
+            </tr>
+            <tr>
+                <td>🏠 Dashboard</td>
+                <td>Halaman utama dengan ringkasan data, notifikasi, dan statistik</td>
+            </tr>
+            <tr>
+                <td>👤 Profil</td>
+                <td>Lihat dan edit informasi pribadi, upload foto</td>
+            </tr>
+            <tr>
+                <td>📚 Riwayat Akademik</td>
+                <td>Input IP & SKS per semester, auto-calculate IPK</td>
+            </tr>
+            <tr>
+                <td>💬 Konsultasi Judul</td>
+                <td>Ajukan judul penelitian, lihat tanggapan dosen</td>
+            </tr>
+            <tr>
+                <td>📁 Dokumen</td>
+                <td>Upload dan kelola file penting (KRS, draft, dll)</td>
+            </tr>
+            <tr>
+                <td>📋 Logbook</td>
+                <td>Riwayat bimbingan, tambah catatan bimbingan</td>
+            </tr>
+            <tr>
+                <td>🔔 Notifikasi</td>
+                <td>Pemberitahuan KRS, logbook baru, peringatan</td>
+            </tr>
+            <tr>
+                <td>🚪 Logout</td>
+                <td>Keluar dari sistem dengan aman</td>
+            </tr>
+        </table>
+
+        <h3>Menu Utama Dosen PA</h3>
+
+        <table>
+            <tr>
+                <th>Menu</th>
+                <th>Fungsi</th>
+            </tr>
+            <tr>
+                <td>🏠 Dashboard</td>
+                <td>Halaman utama dosen dengan daftar mahasiswa bimbingan</td>
+            </tr>
+            <tr>
+                <td>👤 Profil</td>
+                <td>Profil dosen, edit data, upload foto</td>
+            </tr>
+            <tr>
+                <td>👥 Mahasiswa Bimbingan</td>
+                <td>List lengkap mahasiswa PA dengan filter & search</td>
+            </tr>
+            <tr>
+                <td>📊 Laporan</td>
+                <td>Cetak berbagai jenis laporan (7 jenis)</td>
+            </tr>
+            <tr>
+                <td>🔔 Notifikasi</td>
+                <td>Alert konsultasi pending, logbook baru, mahasiswa bermasalah</td>
+            </tr>
+            <tr>
+                <td>🚪 Logout</td>
+                <td>Keluar dari sistem</td>
+            </tr>
+        </table>
+
+        <!-- ========================================== -->
+        <!-- BAGIAN II: PANDUAN MAHASISWA -->
+        <!-- ========================================== -->
+
+        <h1>BAGIAN II: PANDUAN UNTUK MAHASISWA</h1>
+
+        <h2>4. Dashboard Mahasiswa</h2>
+
+        <p>Dashboard mahasiswa adalah halaman utama yang menampilkan ringkasan lengkap informasi akademik Anda.</p>
+
+        <h3>A. Cards Statistik</h3>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h4>📊 IPS Terakhir</h4>
+                <p>Menampilkan Indeks Prestasi Semester terbaru Anda</p>
+            </div>
+            <div class="feature-card">
+                <h4>📚 Total Logbook</h4>
+                <p>Jumlah catatan bimbingan yang telah direkam</p>
+            </div>
+            <div class="feature-card">
+                <h4>📁 Total Dokumen</h4>
+                <p>Jumlah file yang sudah Anda upload ke sistem</p>
+            </div>
+            <div class="feature-card">
+                <h4>💬 Konsultasi Judul</h4>
+                <p>Status pengajuan judul penelitian Anda</p>
+            </div>
+        </div>
+
+        <h3>B. Notifikasi</h3>
+
+        <div class="info-box">
+            <h4>🔔 Jenis Notifikasi yang Ditampilkan</h4>
+            <ul>
+                <li><span class="badge badge-success">KRS Disetujui</span> - Dosen PA telah menyetujui KRS Anda</li>
+                <li><span class="badge badge-danger">KRS Ditolak</span> - KRS perlu revisi dengan alasan tertentu</li>
+                <li><span class="badge badge-info">Logbook Baru</span> - Dosen PA menambahkan catatan bimbingan</li>
+                <li><span class="badge badge-warning">Peringatan</span> - Notifikasi penting lainnya</li>
+            </ul>
+        </div>
+
+        <h3>C. Chart Progress IPS</h3>
+
+        <p>Dashboard menampilkan grafik garis (line chart) yang memvisualisasikan perkembangan Indeks Prestasi Anda per semester. Fitur ini membantu Anda melihat tren akademik:</p>
+
+        <ul>
+            <li>✅ Grafik naik: Performa akademik meningkat</li>
+            <li>⚠️ Grafik turun: Perlu perhatian khusus</li>
+            <li>📈 Data dari input riwayat akademik Anda</li>
+        </ul>
+
+        <h3>D. Progress Pencapaian Studi</h3>
+
+        <p>Sistem melacak 6 milestone utama perjalanan studi Anda:</p>
+
+        <ol>
+            <li><span class="badge badge-success">✓</span> Konsultasi Judul Skripsi</li>
+            <li><span class="badge badge-success">✓</span> Seminar Proposal</li>
+            <li><span class="badge badge-success">✓</span> Seminar Hasil</li>
+            <li><span class="badge badge-success">✓</span> Pendadaran / Sidang Munaqasyah</li>
+            <li><span class="badge badge-success">✓</span> Revisi Final</li>
+            <li><span class="badge badge-success">✓</span> Publikasi Karya Ilmiah</li>
+        </ol>
+
+        <p>Setiap milestone menampilkan:</p>
+        <ul>
+            <li>Status: <span class="badge badge-success">Selesai</span> atau <span class="badge badge-warning">Belum</span></li>
+            <li>Tanggal pencapaian (jika sudah selesai)</li>
+            <li>Catatan tambahan dari dosen</li>
+            <li>Progress bar persentase keseluruhan</li>
+        </ul>
+
+        <h3>E. Evaluasi Soft Skill</h3>
+
+        <p>Menampilkan hasil evaluasi dosen PA terhadap kemampuan non-akademik Anda per periode (semester):</p>
+
+        <table>
+            <tr>
+                <th>Aspek</th>
+                <th>Rentang Nilai</th>
+            </tr>
+            <tr>
+                <td>Komunikasi</td>
+                <td>0 - 100</td>
+            </tr>
+            <tr>
+                <td>Keaktifan</td>
+                <td>0 - 100</td>
+            </tr>
+            <tr>
+                <td>Tanggung Jawab</td>
+                <td>0 - 100</td>
+            </tr>
+            <tr>
+                <td>Disiplin</td>
+                <td>0 - 100</td>
+            </tr>
+        </table>
+
+        <div class="section-divider"></div>
+
+        <h2>5. Mengelola Profil</h2>
+
+        <h3>Melihat Profil</h3>
+
+        <ol class="step-list">
+            <li>
+                <strong>Akses menu Profil</strong><br>
+                Klik menu "Profil" di sidebar/navbar
+            </li>
+            <li>
+                <strong>Lihat informasi lengkap</strong><br>
+                Profil menampilkan: foto, data pribadi, program studi, dosen PA, kontak, IPK, total SKS, dan status akademik
+            </li>
+        </ol>
+
+        <h3>Edit Profil</h3>
+
+        <ol class="step-list">
+            <li>
+                <strong>Klik tombol "Edit Profil"</strong><br>
+                Tombol ada di halaman profil Anda
+            </li>
+            <li>
+                <strong>Ubah data yang diperlukan</strong><br>
+                Field yang dapat diubah: Nama, Tempat/Tanggal Lahir, Jenis Kelamin, Email, Telepon, Alamat, Hobi
+            </li>
+            <li>
+                <strong>Simpan perubahan</strong><br>
+                Klik tombol "Simpan Perubahan" di bagian bawah form
+            </li>
+        </ol>
+
+        <div class="info-box">
+            <h4>💡 Tips Edit Profil</h4>
+            <ul>
+                <li>Pastikan email aktif agar bisa menerima notifikasi</li>
+                <li>No. telepon yang valid memudahkan dosen menghubungi Anda</li>
+                <li>Lengkapi semua field untuk profil yang lebih informatif</li>
+            </ul>
+        </div>
+
+        <h3>Upload Foto Profil</h3>
+
+        <ol class="step-list">
+            <li>
+                <strong>Scroll ke section "Foto Profil"</strong><br>
+                Di halaman Edit Profil
+            </li>
+            <li>
+                <strong>Klik "Choose File" atau "Pilih File"</strong><br>
+                Browse foto dari komputer/laptop Anda
+            </li>
+            <li>
+                <strong>Pilih foto yang sesuai</strong><br>
+                Format: JPG, PNG, JPEG | Max: 2MB
+            </li>
+            <li>
+                <strong>Klik "Upload Foto"</strong><br>
+                Foto lama akan otomatis terganti
+            </li>
+        </ol>
+
+        <div class="warning-box">
+            <h4>⚠️ Syarat Foto Profil</h4>
+            <ul>
+                <li>Format file: JPG, PNG, atau JPEG</li>
+                <li>Ukuran maksimal: 2 MB</li>
+                <li>Disarankan foto formal (pas foto)</li>
+                <li>Resolusi minimal: 300x300 pixel</li>
+                <li>Background terang/netral lebih baik</li>
+            </ul>
+        </div>
+
+        <h3>Upload Dokumen Prestasi</h3>
+
+        <p>Mahasiswa dapat mengupload dokumen prestasi akademik maupun non-akademik:</p>
+
+        <ol class="step-list">
+            <li>
+                <strong>Scroll ke "Dokumen Prestasi"</strong><br>
+                Masih di halaman Edit Profil
+            </li>
+            <li>
+                <strong>Klik "Tambah Dokumen"</strong><br>
+                Form upload akan muncul
+            </li>
+            <li>
+                <strong>Isi form</strong><br>
+                - Nama Prestasi (contoh: Juara 1 Lomba Debat)<br>
+                - Jenis Prestasi: Akademik / Non-Akademik<br>
+                - Upload File (PDF, DOC, JPG - Max 5MB)
+            </li>
+            <li>
+                <strong>Klik "Upload"</strong><br>
+                Dokumen tersimpan dan dapat dilihat dosen PA
+            </li>
+        </ol>
+
+        <div class="section-divider"></div>
+
+        <h2>6. Input Riwayat Akademik</h2>
+
+        <h3>Tujuan Input Riwayat Akademik</h3>
+
+        <ul>
+            <li>✅ Dokumentasi IP & SKS per semester secara sistematis</li>
+            <li>✅ Auto-calculate IPK berdasarkan weighted average</li>
+            <li>✅ Monitoring perkembangan akademik real-time</li>
+            <li>✅ Basis data untuk evaluasi dosen PA</li>
+            <li>✅ Generate chart progress di dashboard</li>
+        </ul>
+
+        <h3>Cara Input Riwayat Akademik</h3>
+
+        <ol class="step-list">
+            <li>
+                <strong>Akses menu "Riwayat Akademik"</strong><br>
+                Klik di sidebar atau menu "Input Riwayat"
+            </li>
+            <li>
+                <strong>Lihat form 14 semester</strong><br>
+                Sistem menyediakan form untuk semester 1 sampai 14
+            </li>
+            <li>
+                <strong>Input data per semester</strong><br>
+                Untuk setiap semester, masukkan:<br>
+                - <strong>IP Semester:</strong> contoh 3.45 atau 3,45<br>
+                - <strong>SKS Semester:</strong> contoh 21
+            </li>
+            <li>
+                <strong>Sistem auto-calculate</strong><br>
+                IPK dan Total SKS akan otomatis terhitung
+            </li>
+            <li>
+                <strong>Klik "Simpan Data"</strong><br>
+                Data tersimpan ke database dan profil terupdate
+            </li>
+        </ol>
+
+        <div class="info-box">
+            <h4>📐 Formula Perhitungan</h4>
+            <p><strong>IPK (Indeks Prestasi Kumulatif):</strong></p>
+            <pre><code>IPK = Σ(IP × SKS) / Σ(SKS)</code></pre>
+            <p><strong>Total SKS:</strong></p>
+            <pre><code>Total SKS = Σ(SKS Semester 1-14)</code></pre>
+        </div>
+
+        <h3>Validasi Input</h3>
+
+        <table>
+            <tr>
+                <th>Field</th>
+                <th>Validasi</th>
+                <th>Contoh Valid</th>
+            </tr>
+            <tr>
+                <td>IP Semester</td>
+                <td>0.00 - 4.00</td>
+                <td>3.45 atau 3,45</td>
+            </tr>
+            <tr>
+                <td>SKS Semester</td>
+                <td>0 - 24</td>
+                <td>21, 20, 18</td>
+            </tr>
+            <tr>
+                <td>Format Desimal</td>
+                <td>Koma atau titik</td>
+                <td>3.45 = 3,45</td>
+            </tr>
+        </table>
+
+        <div class="success-box">
+            <h4>✅ Update Data</h4>
+            <p>Data riwayat akademik dapat diupdate kapan saja. Sistem menggunakan <strong>UPSERT</strong> operation (insert or update), jadi jika data sudah ada, akan di-update; jika belum ada, akan di-insert.</p>
+            <p>IPK dan Total SKS akan otomatis recalculate setiap kali Anda save.</p>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h2>7. Konsultasi Judul Penelitian</h2>
+
+        <p>Fitur ini memungkinkan mahasiswa mengajukan judul penelitian/skripsi kepada dosen PA untuk mendapat persetujuan atau feedback.</p>
+
+        <h3>Cara Mengajukan Judul</h3>
+
+        <ol class="step-list">
+            <li>
+                <strong>Akses menu "Konsultasi Judul"</strong><br>
+                Klik di sidebar mahasiswa
+            </li>
+            <li>
+                <strong>Klik "Ajukan Judul Baru"</strong><br>
+                Tombol atau form pengajuan akan muncul
+            </li>
+            <li>
+                <strong>Isi form pengajuan</strong><br>
+                - <strong>Judul Usulan:</strong> Tuliskan judul penelitian lengkap<br>
+                - <strong>Deskripsi/Latar Belakang:</strong> Jelaskan alasan pemilihan judul, rumusan masalah, dan tujuan penelitian
+            </li>
+            <li>
+                <strong>Klik "Submit Pengajuan"</strong><br>
+                Judul akan masuk ke dashboard dosen PA
+            </li>
+            <li>
+                <strong>Tunggu tanggapan</strong><br>
+                Dosen akan memberi feedback: Disetujui, Ditolak, atau Revisi
+            </li>
+        </ol>
+
+        <h3>Status Konsultasi</h3>
+
+        <table>
+            <tr>
+                <th>Status</th>
+                <th>Arti</th>
+                <th>Action</th>
+            </tr>
+            <tr>
+                <td><span class="badge badge-warning">Menunggu Respon</span></td>
+                <td>Dosen belum menanggapi</td>
+                <td>Tunggu atau follow up ke dosen</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-success">Disetujui</span></td>
+                <td>Judul disetujui dosen</td>
+                <td>Lanjut ke tahap berikutnya</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-danger">Ditolak</span></td>
+                <td>Judul tidak disetujui</td>
+                <td>Baca alasan dan ajukan judul baru</td>
+            </tr>
+        </table>
+
+        <h3>Melihat Tanggapan Dosen</h3>
+
+        <ol>
+            <li>Di halaman "Konsultasi Judul", scroll ke bawah</li>
+            <li>Anda akan melihat <strong>History Konsultasi</strong> dengan detail:
+                <ul>
+                    <li>Tanggal pengajuan</li>
+                    <li>Judul yang diajukan</li>
+                    <li>Deskripsi lengkap</li>
+                    <li>Status (badge berwarna)</li>
+                    <li><strong>Tanggapan Dosen</strong> (jika sudah ditanggapi)</li>
+                    <li>Tanggal respon</li>
+                </ul>
+            </li>
+        </ol>
+
+        <div class="info-box">
+            <h4>💡 Tips Mengajukan Judul</h4>
+            <ul>
+                <li>Ajukan judul dengan deskripsi yang <strong>jelas dan detail</strong></li>
+                <li>Jelaskan latar belakang masalah dengan baik</li>
+                <li>Jika ditolak, <strong>baca alasan dosen dengan seksama</strong></li>
+                <li>Revisi berdasarkan feedback dan ajukan kembali</li>
+                <li>Konsultasi tatap muka jika perlu diskusi lebih mendalam</li>
+            </ul>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h2>8. Upload Dokumen</h2>
+
+        <h3>Tujuan Upload Dokumen</h3>
+
+        <ul>
+            <li>📤 Berbagi file penting dengan dosen PA (KRS, draft, proposal)</li>
+            <li>💾 Dokumentasi digital yang aman dan terpusat</li>
+            <li>🔄 Akses file kapan saja dan di mana saja</li>
+            <li>📊 Monitoring jumlah dokumen yang sudah disubmit</li>
+        </ul>
+
+        <h3>Cara Upload Dokumen</h3>
+
+        <ol class="step-list">
+            <li>
+                <strong>Akses menu "Dokumen" atau "Upload Dokumen"</strong><br>
+                Di sidebar mahasiswa
+            </li>
+            <li>
+                <strong>Klik "Upload Dokumen Baru"</strong><br>
+                Tombol biasanya di bagian atas
+            </li>
+            <li>
+                <strong>Isi form upload</strong><br>
+                - <strong>Judul Dokumen:</strong> Nama/deskripsi file (contoh: Draft KRS Semester 6)<br>
+                - <strong>Pilih File:</strong> Browse file dari komputer Anda
+            </li>
+            <li>
+                <strong>Klik "Upload"</strong><br>
+                File akan tersimpan dan otomatis bisa diakses dosen PA
+            </li>
+        </ol>
+
+        <h3>Jenis File yang Diperbolehkan</h3>
+
+        <table>
+            <tr>
+                <th>Tipe</th>
+                <th>Format</th>
+                <th>Max Size</th>
+            </tr>
+            <tr>
+                <td>📄 Dokumen</td>
+                <td>PDF (.pdf)</td>
+                <td>5 MB</td>
+            </tr>
+            <tr>
+                <td>📝 Word</td>
+                <td>DOC, DOCX (.doc, .docx)</td>
+                <td>5 MB</td>
+            </tr>
+            <tr>
+                <td>🖼️ Gambar</td>
+                <td>JPG, JPEG, PNG (.jpg, .jpeg, .png)</td>
+                <td>5 MB</td>
+            </tr>
+        </table>
+
+        <div class="warning-box">
+            <h4>⚠️ Batasan Upload</h4>
+            <ul>
+                <li>Ukuran maksimal per file: <strong>5 MB</strong></li>
+                <li>File akan otomatis di-rename: <code>{NIM}_{timestamp}.{ext}</code></li>
+                <li>Pastikan file tidak corrupt sebelum upload</li>
+                <li>Jangan upload file yang mengandung virus</li>
+            </ul>
+        </div>
+
+        <h3>Mengelola Dokumen</h3>
+
+        <p><strong>Melihat Dokumen:</strong></p>
+        <ul>
+            <li>Semua dokumen yang diupload tampil di Dashboard atau halaman Dokumen</li>
+            <li>Dosen PA Anda dapat melihat dan mendownload dokumen</li>
+            <li>Informasi: nama file, ukuran, tanggal upload</li>
+        </ul>
+
+        <p><strong>Menghapus Dokumen:</strong></p>
+        <ol>
+            <li>Klik ikon 🗑️ Hapus pada dokumen yang ingin dihapus</li>
+            <li>Konfirmasi penghapusan</li>
+            <li>File fisik dan record database akan terhapus permanen</li>
+        </ol>
+
+        <div class="section-divider"></div>
+
+        <h2>9. Logbook Bimbingan</h2>
+
+        <h3>Apa itu Logbook?</h3>
+
+        <p>Logbook adalah <strong>catatan digital</strong> dari setiap sesi bimbingan antara Anda dan dosen PA. Baik mahasiswa maupun dosen dapat menambahkan catatan, sehingga riwayat bimbingan terdokumentasi dengan lengkap.</p>
+
+        <h3>Menambah Catatan Logbook</h3>
+
+        <ol class="step-list">
+            <li>
+                <strong>Scroll ke section "Logbook Bimbingan"</strong><br>
+                Di Dashboard mahasiswa atau menu Logbook
+            </li>
+            <li>
+                <strong>Klik "Tambah Catatan Bimbingan"</strong><br>
+                Form input akan muncul
+            </li>
+            <li>
+                <strong>Isi form</strong><br>
+                - <strong>Tanggal Bimbingan:</strong> Pilih tanggal (default: hari ini)<br>
+                - <strong>Topik Bimbingan:</strong> Judul/tema diskusi<br>
+                - <strong>Isi Bimbingan:</strong> Detail pembahasan, pertanyaan, catatan penting
+            </li>
+            <li>
+                <strong>Klik "Simpan Logbook"</strong><br>
+                Catatan tersimpan dan dosen akan menerima notifikasi
+            </li>
+        </ol>
+
+        <h3>Catatan dari Dosen</h3>
+
+        <div class="info-box">
+            <h4>🔔 Notifikasi Logbook Baru</h4>
+            <p>Dosen PA juga dapat menambahkan logbook untuk Anda. Ketika dosen menambah catatan:</p>
+            <ul>
+                <li>Anda akan menerima <strong>notifikasi</strong> di dashboard</li>
+                <li>Badge "Belum Dibaca" akan muncul pada logbook</li>
+                <li>Buka Dashboard untuk melihat isi catatan dosen</li>
+                <li>Status otomatis berubah menjadi "Dibaca" setelah Anda buka</li>
+            </ul>
+        </div>
+
+        <h3>Melihat History Logbook</h3>
+
+        <p>Semua logbook tersimpan permanen dan dapat dilihat kapan saja:</p>
+
+        <ul>
+            <li>📅 <strong>Tanggal bimbingan</strong> - Kapan sesi dilakukan</li>
+            <li>📝 <strong>Topik</strong> - Tema diskusi</li>
+            <li>💬 <strong>Isi pembahasan</strong> - Detail lengkap</li>
+            <li>🎯 <strong>Tindak lanjut</strong> - Action items</li>
+            <li>👤 <strong>Pengisi</strong> - Mahasiswa atau Dosen</li>
+        </ul>
+
+        <h3>Fitur Lanjutan</h3>
+
+        <table>
+            <tr>
+                <th>Fitur</th>
+                <th>Fungsi</th>
+            </tr>
+            <tr>
+                <td>🖨️ Cetak Logbook</td>
+                <td>Export semua logbook ke PDF atau HTML untuk dokumentasi</td>
+            </tr>
+            <tr>
+                <td>✏️ Edit Logbook</td>
+                <td>Edit catatan yang sudah dibuat (jika ada kesalahan input)</td>
+            </tr>
+            <tr>
+                <td>🗑️ Hapus Logbook</td>
+                <td>Hapus catatan yang tidak relevan (hanya pemilik yang bisa hapus)</td>
+            </tr>
+        </table>
+
+        <div class="section-divider"></div>
+
+        <h2>10. Evaluasi Dosen PA</h2>
+
+        <h3>Tujuan Evaluasi</h3>
+
+        <p>Sistem menyediakan <strong>evaluasi dua arah</strong>. Mahasiswa dapat memberikan feedback terhadap kinerja dosen PA mereka. Evaluasi ini membantu:</p>
+
+        <ul>
+            <li>✅ Meningkatkan kualitas bimbingan</li>
+            <li>✅ Memberikan masukan konstruktif kepada dosen</li>
+            <li>✅ Dokumentasi hubungan akademik</li>
+            <li>✅ Evaluasi berkala per semester</li>
+        </ul>
+
+        <h3>Cara Melakukan Evaluasi</h3>
+
+        <ol class="step-list">
+            <li>
+                <strong>Scroll ke "Evaluasi Dosen PA"</strong><br>
+                Di Dashboard mahasiswa
+            </li>
+            <li>
+                <strong>Klik "Beri Evaluasi"</strong><br>
+                Form evaluasi akan muncul
+            </li>
+            <li>
+                <strong>Berikan skor untuk setiap aspek</strong><br>
+                Skala 1-5 (bintang):
+                <ul>
+                    <li><strong>Komunikasi:</strong> Kemampuan dosen berkomunikasi dengan jelas</li>
+                    <li><strong>Membantu:</strong> Seberapa helpful dosen dalam membantu mahasiswa</li>
+                    <li><strong>Solusi:</strong> Kemampuan memberikan solusi atas masalah akademik</li>
+                </ul>
+            </li>
+            <li>
+                <strong>Tambahkan Saran & Kritik</strong><br>
+                Text area untuk feedback detail (opsional)
+            </li>
+            <li>
+                <strong>Klik "Submit Evaluasi"</strong><br>
+                Evaluasi tersimpan dan bisa dilihat dosen
+            </li>
+        </ol>
+
+        <h3>Skor & Skala Penilaian</h3>
+
+        <table>
+            <tr>
+                <th>Skor</th>
+                <th>Bintang</th>
+                <th>Kategori</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>⭐</td>
+                <td>Sangat Kurang</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>⭐⭐</td>
+                <td>Kurang</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>⭐⭐⭐</td>
+                <td>Cukup</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>⭐⭐⭐⭐</td>
+                <td>Baik</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>⭐⭐⭐⭐⭐</td>
+                <td>Sangat Baik</td>
+            </tr>
+        </table>
+
+        <div class="info-box">
+            <h4>💡 Catatan Penting</h4>
+            <ul>
+                <li>Evaluasi bersifat <strong>rahasia</strong> dan membantu peningkatan kualitas dosen</li>
+                <li>Berikan feedback yang <strong>jujur dan konstruktif</strong></li>
+                <li>Evaluasi dapat dilakukan per periode (misal: setiap semester)</li>
+                <li>Saran & kritik sebaiknya spesifik dan solusi-oriented</li>
+            </ul>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h2>11. Melihat & Mencetak Laporan</h2>
+
+        <h3>Jenis Laporan untuk Mahasiswa</h3>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h4>📊 Cetak Pencapaian</h4>
+                <p><strong>Konten:</strong> Laporan milestone studi (6 tahapan)<br>
+                <strong>Format:</strong> HTML modern design<br>
+                <strong>Akses:</strong> Dashboard → "Cetak Pencapaian"</p>
+            </div>
+            <div class="feature-card">
+                <h4>📚 Cetak Logbook</h4>
+                <p><strong>Konten:</strong> Semua catatan bimbingan<br>
+                <strong>Format:</strong> HTML table<br>
+                <strong>Akses:</strong> Menu Logbook → "Cetak Logbook"</p>
+            </div>
+            <div class="feature-card">
+                <h4>💬 Cetak Konsultasi Judul</h4>
+                <p><strong>Konten:</strong> History pengajuan judul + tanggapan<br>
+                <strong>Format:</strong> HTML<br>
+                <strong>Akses:</strong> Menu Konsultasi → "Cetak"</p>
+            </div>
+            <div class="feature-card">
+                <h4>📈 Cetak Kemajuan Studi</h4>
+                <p><strong>Konten:</strong> Progress milestone dengan visual<br>
+                <strong>Format:</strong> PDF<br>
+                <strong>Akses:</strong> Dashboard → "Cetak Kemajuan"</p>
+            </div>
+        </div>
+
+        <h3>Cara Mencetak Laporan</h3>
+
+        <ol class="step-list">
+            <li>
+                <strong>Pilih jenis laporan</strong><br>
+                Klik tombol/link cetak di halaman terkait
+            </li>
+            <li>
+                <strong>Laporan akan terbuka</strong><br>
+                Di tab baru browser Anda (PDF atau HTML)
+            </li>
+            <li>
+                <strong>Print atau Save as PDF</strong><br>
+                - Tekan <strong>Ctrl+P</strong> (Windows) atau <strong>Cmd+P</strong> (Mac)<br>
+                - Pilih printer atau "Save as PDF"<br>
+                - Sesuaikan setting: A4, Portrait
+            </li>
+            <li>
+                <strong>Simpan file</strong><br>
+                Download atau print langsung
+            </li>
+        </ol>
+
+        <div class="info-box">
+            <h4>💡 Tips Mencetak</h4>
+            <ul>
+                <li>Gunakan <strong>Print to PDF</strong> dari browser untuk simpan file digital</li>
+                <li>Pastikan printer setting: <strong>Portrait</strong>, <strong>A4</strong></li>
+                <li>Simpan file PDF untuk arsip pribadi</li>
+                <li>Laporan HTML lebih fleksibel untuk edit sebelum print</li>
+            </ul>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- BAGIAN III: PANDUAN DOSEN PA -->
+        <!-- ========================================== -->
+
+        <h1>BAGIAN III: PANDUAN UNTUK DOSEN PA</h1>
+
+        <h2>12. Dashboard Dosen PA</h2>
+
+        <p>Dashboard dosen PA menampilkan ringkasan lengkap mahasiswa bimbingan dengan berbagai fitur monitoring dan manajemen.</p>
+
+        <h3>A. Cards Statistik</h3>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h4>👥 Total Mahasiswa</h4>
+                <p>Jumlah seluruh mahasiswa bimbingan PA Anda</p>
+            </div>
+            <div class="feature-card">
+                <h4>⚠️ Perlu Perhatian</h4>
+                <p>Mahasiswa dengan IPK < 2.75 atau status Non-Aktif</p>
+            </div>
+            <div class="feature-card">
+                <h4>🔔 Notifikasi</h4>
+                <p>Gabungan: Logbook belum dibaca + Konsultasi pending</p>
+            </div>
+            <div class="feature-card">
+                <h4>✅ Mahasiswa Aktif</h4>
+                <p>Jumlah mahasiswa dengan status aktif saat ini</p>
+            </div>
+        </div>
+
+        <h3>B. Tabel Mahasiswa Bimbingan</h3>
+
+        <p>Tabel lengkap menampilkan semua mahasiswa dengan kolom:</p>
+
+        <table>
+            <tr>
+                <th>Kolom</th>
+                <th>Deskripsi</th>
+            </tr>
+            <tr>
+                <td>Nama Mahasiswa</td>
+                <td>Nama lengkap mahasiswa</td>
+            </tr>
+            <tr>
+                <td>NIM</td>
+                <td>Nomor Induk Mahasiswa</td>
+            </tr>
+            <tr>
+                <td>Angkatan</td>
+                <td>Tahun angkatan masuk</td>
+            </tr>
+            <tr>
+                <td>Program Studi</td>
+                <td>Nama prodi mahasiswa</td>
+            </tr>
+            <tr>
+                <td>IPK</td>
+                <td>Indeks Prestasi Kumulatif (merah jika < 2.75)</td>
+            </tr>
+            <tr>
+                <td>Total SKS</td>
+                <td>Jumlah SKS yang sudah ditempuh</td>
+            </tr>
+            <tr>
+                <td>Status</td>
+                <td>Aktif / Non-Aktif</td>
+            </tr>
+            <tr>
+                <td>KRS</td>
+                <td>Status approval KRS (Approved/Pending/Rejected)</td>
+            </tr>
+            <tr>
+                <td>Aksi</td>
+                <td>Tombol "Detail" untuk melihat info lengkap</td>
+            </tr>
+        </table>
+
+        <h3>C. Filter & Search</h3>
+
+        <ul>
+            <li>🔍 <strong>Search:</strong> Cari berdasarkan nama atau NIM mahasiswa</li>
+            <li>📅 <strong>Filter Angkatan:</strong> Filter mahasiswa by tahun angkatan</li>
+            <li>📊 <strong>Filter Status:</strong> Tampilkan Aktif / Non-Aktif / Semua</li>
+        </ul>
+
+        <h3>D. Sidebar Alerts</h3>
+
+        <div class="warning-box">
+            <h4>⚠️ Alert Penting</h4>
+            <ul>
+                <li>💬 <strong>Logbook Baru:</strong> Notifikasi logbook dari mahasiswa yang belum Anda baca</li>
+                <li>📝 <strong>Konsultasi Pending:</strong> Judul penelitian yang menunggu tanggapan Anda</li>
+                <li>⚠️ <strong>Mahasiswa Bermasalah:</strong> Mahasiswa dengan IPK rendah atau nilai kritis</li>
+            </ul>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h2>13. Mengelola Profil Dosen</h2>
+
+        <h3>Melihat Profil</h3>
+
+        <ol class="step-list">
+            <li>
+                <strong>Klik menu "Profil"</strong><br>
+                Di sidebar atau navbar dosen
+            </li>
+            <li>
+                <strong>Lihat informasi lengkap</strong><br>
+                Foto, nama, NIP/NIDN, tempat/tanggal lahir, kontak, pendidikan, bidang keahlian, jabatan akademik
+            </li>
+        </ol>
+
+        <h3>Edit Profil</h3>
+
+        <ol class="step-list">
+            <li>
+                <strong>Klik "Edit Profil"</strong><br>
+                Tombol di halaman profil
+            </li>
+            <li>
+                <strong>Update data</strong><br>
+                Field: Nama, NIP, Tempat/Tgl Lahir, Jenis Kelamin, Email, Telepon, Alamat, Pendidikan, Bidang Keahlian, Jabatan
+            </li>
+            <li>
+                <strong>Simpan perubahan</strong><br>
+                Klik tombol "Simpan Perubahan"
+            </li>
+        </ol>
+
+        <h3>Upload Foto Profil</h3>
+
+        <ol>
+            <li>Di halaman Edit Profil, section "Foto Profil"</li>
+            <li>Klik "Choose File", pilih foto (JPG, PNG, JPEG)</li>
+            <li>Klik "Upload Foto"</li>
+            <li>Foto lama otomatis terganti</li>
+        </ol>
+
+        <div class="warning-box">
+            <h4>⚠️ Syarat Foto</h4>
+            <p>Format: JPG, PNG, JPEG | Max: 2MB | Disarankan foto formal</p>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h2>14. Melihat Detail Mahasiswa Bimbingan</h2>
+
+        <h3>Akses Detail Mahasiswa</h3>
+
+        <ol class="step-list">
+            <li>
+                <strong>Dari Dashboard</strong><br>
+                Klik tombol "Detail" pada row mahasiswa tertentu
+            </li>
+            <li>
+                <strong>Halaman detail terbuka</strong><br>
+                Menampilkan informasi super lengkap mahasiswa
+            </li>
+        </ol>
+
+        <h3>Informasi yang Ditampilkan</h3>
+
+        <h4>A. Profile Card</h4>
+        <ul>
+            <li>Foto mahasiswa</li>
+            <li>Nama, NIM, Angkatan</li>
+            <li>Program Studi</li>
+            <li>IPK, Total SKS</li>
+            <li>Status Akademik</li>
+            <li>Semester aktif</li>
+        </ul>
+
+        <h4>B. Catatan Khusus Dosen</h4>
+
+        <div class="info-box">
+            <h4>📝 Fitur Catatan Khusus</h4>
+            <p>Text area untuk catatan pribadi dosen yang otomatis save ke database dan tersimpan juga di logbook.</p>
+            <p><strong>Cara Menambah:</strong></p>
+            <ol>
+                <li>Tulis catatan di text area</li>
+                <li>Klik "Simpan Catatan"</li>
+                <li>Catatan tersimpan dan muncul notifikasi ke mahasiswa</li>
+            </ol>
+        </div>
+
+        <h4>C. Riwayat Bimbingan (Logbook)</h4>
+        <ul>
+            <li>Tabel semua sesi bimbingan</li>
+            <li>Detail: tanggal, topik, isi, tindak lanjut</li>
+            <li>Pengisi: Mahasiswa/Dosen</li>
+            <li>Opsi: <strong>Edit</strong>, <strong>Hapus</strong></li>
+        </ul>
+
+        <h4>D. Konsultasi Judul</h4>
+        <ul>
+            <li>List semua judul yang diajukan mahasiswa</li>
+            <li>Status: Menunggu/Disetujui/Ditolak</li>
+            <li>Tombol "Tanggapi" untuk beri feedback</li>
+        </ul>
+
+        <h4>E. Nilai Bermasalah</h4>
+        <ul>
+            <li>Daftar mata kuliah dengan nilai D atau E</li>
+            <li>Semester diambil</li>
+            <li>Tombol "Hapus" jika sudah tidak relevan</li>
+        </ul>
+
+        <h4>F. Evaluasi dari Mahasiswa</h4>
+        <ul>
+            <li>Feedback mahasiswa terhadap Anda</li>
+            <li>Skor komunikasi, membantu, solusi</li>
+            <li>Saran & kritik</li>
+        </ul>
+
+        <h4>G. Progress Pencapaian</h4>
+        <ul>
+            <li>Visual progress bar 6 milestone</li>
+            <li>Status selesai/belum setiap milestone</li>
+            <li>Persentase keseluruhan</li>
+        </ul>
+
+        <div class="section-divider"></div>
+
+        <h2>15. Approval KRS Mahasiswa</h2>
+
+        <p>Dosen PA bertanggung jawab menyetujui atau menolak KRS mahasiswa bimbingannya.</p>
+
+        <h3>Cara Approve KRS</h3>
+
+        <ol class="step-list">
+            <li>
+                <strong>Lihat status KRS</strong><br>
+                Di Dashboard atau Detail Mahasiswa, lihat kolom/badge "KRS"
+            </li>
+            <li>
+                <strong>Jika status "Pending"</strong><br>
+                Klik tombol <span class="badge badge-success">Setujui KRS ✅</span>
+            </li>
+            <li>
+                <strong>Sistem otomatis:</strong>
+                <ul>
+                    <li>Update status KRS → Approved</li>
+                    <li>Kirim notifikasi ke mahasiswa</li>
+                    <li>Tambahkan logbook otomatis</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h3>Cara Reject KRS</h3>
+
+        <ol class="step-list">
+            <li>
+                <strong>Klik tombol</strong> <span class="badge badge-danger">Tolak KRS ❌</span>
+            </li>
+            <li>
+                <strong>Sistem otomatis:</strong>
+                <ul>
+                    <li>Update status KRS → Rejected</li>
+                    <li>Kirim notifikasi ke mahasiswa</li>
+                    <li>Mahasiswa harus revisi KRS</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h3>Status KRS</h3>
+
+        <table>
+            <tr>
+                <th>Status</th>
+                <th>Badge</th>
+                <th>Arti</th>
+            </tr>
+            <tr>
+                <td>Disetujui</td>
+                <td><span class="badge badge-success">Approved</span></td>
+                <td>Mahasiswa boleh lanjut proses akademik</td>
+            </tr>
+            <tr>
+                <td>Ditolak</td>
+                <td><span class="badge badge-danger">Rejected</span></td>
+                <td>Mahasiswa harus revisi KRS</td>
+            </tr>
+            <tr>
+                <td>Pending</td>
+                <td><span class="badge badge-warning">Pending</span></td>
+                <td>Menunggu approval dari dosen PA</td>
+            </tr>
+        </table>
+
+        <div class="success-box">
+            <h4>✅ Notifikasi Otomatis</h4>
+            <p>Mahasiswa akan otomatis menerima notifikasi di Dashboard mereka saat KRS disetujui atau ditolak. Notifikasi akan muncul di badge "Belum Dibaca" dan mahasiswa akan melihatnya saat login.</p>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h2>16. Menanggapi Konsultasi Judul</h2>
+
+        <h3>Cara Menanggapi Konsultasi</h3>
+
+        <ol class="step-list">
+            <li>
+                <strong>Buka Detail Mahasiswa</strong><br>
+                Klik tombol "Detail" pada mahasiswa tertentu
+            </li>
+            <li>
+                <strong>Scroll ke "Konsultasi Judul"</strong><br>
+                Section daftar konsultasi judul mahasiswa
+            </li>
+            <li>
+                <strong>Untuk konsultasi "Menunggu Respon"</strong><br>
+                Klik tombol "Tanggapi"
+            </li>
+            <li>
+                <strong>Isi form tanggapan</strong><br>
+                - <strong>Status:</strong> Disetujui / Ditolak / Revisi<br>
+                - <strong>Catatan Dosen:</strong> Feedback, saran, atau alasan penolakan
+            </li>
+            <li>
+                <strong>Klik "Simpan Tanggapan"</strong><br>
+                Tanggapan tersimpan dan mahasiswa dapat melihatnya
+            </li>
+        </ol>
+
+        <div class="info-box">
+            <h4>💡 Best Practice Menanggapi</h4>
+            <ul>
+                <li>Beri feedback yang <strong>konstruktif dan spesifik</strong></li>
+                <li>Jika menolak, jelaskan alasan dengan jelas</li>
+                <li>Berikan saran judul alternatif jika memungkinkan</li>
+                <li>Tanggapi dalam waktu yang wajar (maksimal 1 minggu)</li>
+                <li>Jika perlu diskusi lebih lanjut, jadwalkan konsultasi tatap muka</li>
+            </ul>
+        </div>
+
+        <h3>Notifikasi</h3>
+
+        <p>Mahasiswa akan otomatis menerima notifikasi dan bisa melihat tanggapan Anda di halaman Konsultasi Judul mereka. Mereka dapat mengajukan judul baru jika judul sebelumnya ditolak.</p>
+
+        <div class="section-divider"></div>
+
+        <h2>17. Menambah Logbook Bimbingan</h2>
+
+        <h3>Cara Menambah Logbook</h3>
+
+        <ol class="step-list">
+            <li>
+                <strong>Di halaman Detail Mahasiswa</strong><br>
+                Pastikan Anda sudah di halaman detail mahasiswa tertentu
+            </li>
+            <li>
+                <strong>Scroll ke "Riwayat Bimbingan"</strong><br>
+                Section logbook bimbingan
+            </li>
+            <li>
+                <strong>Klik "Tambah Logbook"</strong><br>
+                Form input logbook akan muncul
+            </li>
+            <li>
+                <strong>Isi form</strong><br>
+                - <strong>Tanggal Bimbingan:</strong> Pilih tanggal (default: hari ini)<br>
+                - <strong>Topik Bimbingan:</strong> Topik/judul diskusi<br>
+                - <strong>Isi Bimbingan:</strong> Detail pembahasan, poin-poin penting<br>
+                - <strong>Tindak Lanjut:</strong> Apa yang harus dilakukan mahasiswa selanjutnya
+            </li>
+            <li>
+                <strong>Klik "Simpan Logbook"</strong><br>
+                Logbook tersimpan dan mahasiswa dapat notifikasi
+            </li>
+        </ol>
+
+        <h3>Fitur Tambahan</h3>
+
+        <table>
+            <tr>
+                <th>Fitur</th>
+                <th>Fungsi</th>
+            </tr>
+            <tr>
+                <td>✏️ Edit Logbook</td>
+                <td>Klik ikon ✏️ untuk edit catatan yang sudah dibuat</td>
+            </tr>
+            <tr>
+                <td>🗑️ Hapus Logbook</td>
+                <td>Klik ikon 🗑️ untuk hapus catatan tertentu</td>
+            </tr>
+            <tr>
+                <td>🔔 Status Baca</td>
+                <td>Mahasiswa otomatis dapat notifikasi "Belum Dibaca"</td>
+            </tr>
+        </table>
+
+        <div class="info-box">
+            <h4>💡 Tips Logbook Efektif</h4>
+            <ul>
+                <li><strong>Catat setiap sesi bimbingan</strong> secara rutin untuk dokumentasi lengkap</li>
+                <li><strong>Detail isi bimbingan</strong> membantu tracking progress mahasiswa</li>
+                <li><strong>Tindak lanjut jelas</strong> membantu mahasiswa tahu next action</li>
+                <li>Gunakan bahasa yang profesional namun mudah dipahami</li>
+                <li>Buat catatan segera setelah bimbingan agar tidak lupa detail</li>
+            </ul>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h2>18. Evaluasi Soft Skill Mahasiswa</h2>
+
+        <h3>Tujuan Evaluasi</h3>
+
+        <p>Dosen PA dapat mengevaluasi soft skill mahasiswa bimbingannya per periode (misal: per semester). Evaluasi ini untuk:</p>
+
+        <ul>
+            <li>✅ Dokumentasi perkembangan non-akademik mahasiswa</li>
+            <li>✅ Feedback konstruktif untuk mahasiswa</li>
+            <li>✅ Bahan evaluasi akhir semester</li>
+            <li>✅ Identifikasi area yang perlu ditingkatkan</li>
+        </ul>
+
+        <h3>Cara Melakukan Evaluasi</h3>
+
+        <ol class="step-list">
+            <li>
+                <strong>Di halaman Detail Mahasiswa</strong><br>
+                Scroll ke section "Evaluasi Soft Skill"
+            </li>
+            <li>
+                <strong>Klik "Tambah Evaluasi"</strong><br>
+                Form evaluasi akan muncul
+            </li>
+            <li>
+                <strong>Pilih Periode</strong><br>
+                Contoh: 2024-Ganjil, 2024-Genap, 2025-Ganjil
+            </li>
+            <li>
+                <strong>Beri nilai setiap aspek</strong><br>
+                Skala 1-100 untuk:
+                <ul>
+                    <li><strong>Komunikasi:</strong> Kemampuan berkomunikasi</li>
+                    <li><strong>Keaktifan:</strong> Proaktif dalam konsultasi</li>
+                    <li><strong>Tanggung Jawab:</strong> Menyelesaikan tugas tepat waktu</li>
+                    <li><strong>Disiplin:</strong> Ketepatan waktu dan komitmen</li>
+                </ul>
+            </li>
+            <li>
+                <strong>Tambahkan Catatan</strong><br>
+                Catatan tambahan atau saran (opsional)
+            </li>
+            <li>
+                <strong>Klik "Simpan Evaluasi"</strong><br>
+                Evaluasi tersimpan dan dapat dilihat mahasiswa
+            </li>
+        </ol>
+
+        <h3>Panduan Penilaian</h3>
+
+        <table>
+            <tr>
+                <th>Rentang Nilai</th>
+                <th>Kategori</th>
+                <th>Deskripsi</th>
+            </tr>
+            <tr>
+                <td>85 - 100</td>
+                <td><span class="badge badge-success">Sangat Baik</span></td>
+                <td>Mahasiswa sangat unggul di aspek ini</td>
+            </tr>
+            <tr>
+                <td>70 - 84</td>
+                <td><span class="badge badge-info">Baik</span></td>
+                <td>Mahasiswa menunjukkan kemampuan baik</td>
+            </tr>
+            <tr>
+                <td>60 - 69</td>
+                <td><span class="badge badge-warning">Cukup</span></td>
+                <td>Perlu sedikit peningkatan</td>
+            </tr>
+            <tr>
+                <td>< 60</td>
+                <td><span class="badge badge-danger">Kurang</span></td>
+                <td>Perlu perhatian dan pembinaan khusus</td>
+            </tr>
+        </table>
+
+        <div class="section-divider"></div>
+
+        <h2>19. Input Nilai Bermasalah</h2>
+
+        <h3>Apa itu Nilai Bermasalah?</h3>
+
+        <p>Nilai bermasalah adalah mata kuliah yang nilai akhirnya <strong>D atau E</strong> yang perlu mendapat perhatian khusus dan bimbingan intensif.</p>
+
+        <h3>Cara Input Nilai Bermasalah</h3>
+
+        <ol class="step-list">
+            <li>
+                <strong>Di halaman Detail Mahasiswa</strong><br>
+                Scroll ke section "Nilai Bermasalah (D/E)"
+            </li>
+            <li>
+                <strong>Klik "Tambah Nilai Bermasalah"</strong><br>
+                Form input akan muncul
+            </li>
+            <li>
+                <strong>Isi form</strong><br>
+                - <strong>Nama Mata Kuliah:</strong> Contoh: Bahasa Arab I<br>
+                - <strong>Semester Diambil:</strong> Contoh: 3<br>
+                - <strong>Nilai Huruf:</strong> Pilih D atau E
+            </li>
+            <li>
+                <strong>Klik "Simpan"</strong><br>
+                Data nilai bermasalah tersimpan
+            </li>
+        </ol>
+
+        <h3>Fungsi Nilai Bermasalah</h3>
+
+        <ul>
+            <li>📊 Dokumentasi mata kuliah yang perlu diperbaiki</li>
+            <li>🎯 Basis untuk bimbingan akademik lebih intensif</li>
+            <li>📄 Dapat dicetak sebagai laporan khusus</li>
+            <li>⚠️ Monitoring mahasiswa yang perlu perhatian</li>
+        </ul>
+
+        <h3>Menghapus Nilai Bermasalah</h3>
+
+        <p>Jika mahasiswa sudah perbaikan nilai (misal: mengulang matakuliah dan dapat nilai lebih baik):</p>
+
+        <ol>
+            <li>Klik tombol "Hapus" pada mata kuliah tertentu</li>
+            <li>Konfirmasi penghapusan</li>
+            <li>Record nilai bermasalah akan terhapus dari sistem</li>
+        </ol>
+
+        <div class="section-divider"></div>
+
+        <h2>20. Mencetak Berbagai Laporan</h2>
+
+        <h3>7 Jenis Laporan yang Tersedia</h3>
+
+        <div class="feature-grid" style="grid-template-columns: 1fr;">
+            
+            <div class="feature-card">
+                <h4>A. Cetak Logbook</h4>
+                <p><strong>Konten:</strong> Semua riwayat bimbingan mahasiswa<br>
+                <strong>Format:</strong> HTML table<br>
+                <strong>Cara:</strong> Detail Mahasiswa → Klik "Cetak Logbook"</p>
+            </div>
+
+            <div class="feature-card">
+                <h4>B. Cetak Kemajuan Studi</h4>
+                <p><strong>Konten:</strong> Progress milestone (6 tahapan)<br>
+                <strong>Format:</strong> PDF dengan progress bar<br>
+                <strong>Cara:</strong> Detail Mahasiswa → Klik "Cetak Kemajuan"</p>
+            </div>
+
+            <div class="feature-card">
+                <h4>C. Cetak Pencapaian</h4>
+                <p><strong>Konten:</strong> Pencapaian studi dengan design modern<br>
+                <strong>Format:</strong> HTML dengan card design<br>
+                <strong>Cara:</strong> Detail Mahasiswa → Klik "Cetak Pencapaian"</p>
+            </div>
+
+            <div class="feature-card">
+                <h4>D. Cetak Riwayat Bimbingan</h4>
+                <p><strong>Konten:</strong> Sama seperti logbook, format PDF<br>
+                <strong>Format:</strong> PDF formal<br>
+                <strong>Cara:</strong> Detail Mahasiswa → Klik "Cetak Riwayat"</p>
+            </div>
+
+            <div class="feature-card">
+                <h4>E. Cetak Konsultasi Judul</h4>
+                <p><strong>Konten:</strong> History konsultasi judul + tanggapan<br>
+                <strong>Format:</strong> HTML<br>
+                <strong>Cara:</strong> Detail Mahasiswa → Tab Konsultasi → "Cetak"</p>
+            </div>
+
+            <div class="feature-card">
+                <h4>F. Cetak Nilai Kritis</h4>
+                <p><strong>Konten:</strong> Daftar mata kuliah dengan nilai D/E<br>
+                <strong>Format:</strong> PDF dengan highlight merah<br>
+                <strong>Cara:</strong> Detail Mahasiswa → "Cetak Nilai Kritis"</p>
+            </div>
+
+            <div class="feature-card">
+                <h4>G. Cetak Laporan Lengkap ⭐</h4>
+                <p><strong>Konten:</strong> SUPER LENGKAP (All-in-One):<br>
+                - Data mahasiswa<br>
+                - Logbook terakhir<br>
+                - Kemajuan studi<br>
+                - Nilai bermasalah<br>
+                - Riwayat akademik (IP/SKS)<br>
+                - Evaluasi soft skill<br>
+                <strong>Format:</strong> PDF profesional dengan header UIN Palopo<br>
+                <strong>Cara:</strong> Detail Mahasiswa → "Cetak Laporan Lengkap"</p>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h4>💡 Tips Mencetak</h4>
+            <ul>
+                <li>Laporan PDF otomatis download atau buka di tab baru</li>
+                <li>Laporan HTML bisa di-print atau Save as PDF dari browser</li>
+                <li>Gunakan <strong>Laporan Lengkap</strong> untuk dokumentasi akhir semester</li>
+                <li>Cetak nilai kritis untuk monitoring khusus mahasiswa bermasalah</li>
+                <li>Simpan laporan digital untuk arsip fakultas</li>
+            </ul>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- BAGIAN IV: TIPS & TROUBLESHOOTING -->
+        <!-- ========================================== -->
+
+        <h1>BAGIAN IV: TIPS & TROUBLESHOOTING</h1>
+
+        <h2>21. FAQ (Frequently Asked Questions)</h2>
+
+        <h3>Q1: Lupa password, bagaimana?</h3>
+        <p><strong>A:</strong> Hubungi admin sistem atau bagian IT kampus untuk reset password. Bawa kartu identitas untuk verifikasi.</p>
+
+        <h3>Q2: Upload file gagal terus, kenapa?</h3>
+        <p><strong>A:</strong> Pastikan:</p>
+        <ul>
+            <li>Ukuran file tidak melebihi <strong>5 MB</strong></li>
+            <li>Format file sesuai (PDF, DOC, DOCX, JPG, PNG)</li>
+            <li>Koneksi internet stabil</li>
+            <li>Folder <code>dokumen/</code> dan <code>assets/uploads/</code> memiliki write permission</li>
+        </ul>
+
+        <h3>Q3: IPK tidak terupdate setelah input riwayat akademik?</h3>
+        <p><strong>A:</strong></p>
+        <ul>
+            <li>Pastikan Anda klik tombol "Simpan Data"</li>
+            <li>Refresh halaman (F5 atau Ctrl+R)</li>
+            <li>Jika masih gagal, logout dan login kembali</li>
+        </ul>
+
+        <h3>Q4: Notifikasi tidak muncul?</h3>
+        <p><strong>A:</strong></p>
+        <ul>
+            <li>Refresh dashboard</li>
+            <li>Clear browser cache</li>
+            <li>Pastikan browser JavaScript enabled</li>
+        </ul>
+
+        <h3>Q5: Mahasiswa tidak menerima notifikasi persetujuan KRS?</h3>
+        <p><strong>A:</strong> (Untuk Dosen)</p>
+        <ul>
+            <li>Pastikan klik tombol Approve/Reject sampai selesai</li>
+            <li>Mahasiswa harus login ulang untuk melihat notifikasi</li>
+        </ul>
+
+        <h3>Q6: Tidak bisa hapus logbook?</h3>
+        <p><strong>A:</strong></p>
+        <ul>
+            <li>Pastikan Anda pemilik logbook (yang input)</li>
+            <li>Dosen PA dapat hapus logbook mahasiswa bimbingannya</li>
+            <li>Admin dapat hapus semua logbook</li>
+        </ul>
+
+        <h3>Q7: Foto profil tidak tampil?</h3>
+        <p><strong>A:</strong></p>
+        <ul>
+            <li>Pastikan file berhasil diupload (ada pesan sukses)</li>
+            <li>Hard refresh browser (Ctrl+Shift+R)</li>
+            <li>Cek folder <code>assets/uploads/</code> apakah file ada</li>
+        </ul>
+
+        <h3>Q8: Laporan PDF tidak bisa dibuka?</h3>
+        <p><strong>A:</strong></p>
+        <ul>
+            <li>Pastikan ada aplikasi PDF reader (Adobe, browser PDF viewer)</li>
+                        <li>Download file dulu, jangan buka langsung</li>
+            <li>Jika corrupt, generate ulang laporan</li>
+        </ul>
+
+        <div class="section-divider"></div>
+
+        <h2>22. Troubleshooting</h2>
+
+        <h3>Masalah Login</h3>
+
+        <div class="warning-box">
+            <h4>⚠️ Gejala: "Username atau password salah" terus-menerus</h4>
+            <p><strong>Solusi:</strong></p>
+            <ol>
+                <li>Pastikan username benar (NIM untuk mahasiswa, ID/NIP untuk dosen)</li>
+                <li>Password case-sensitive, periksa CAPS LOCK</li>
+                <li>Coba reset password via admin</li>
+                <li>Coba browser lain (Chrome, Firefox, Edge)</li>
+            </ol>
+        </div>
+
+        <div class="warning-box">
+            <h4>⚠️ Gejala: Setelah login, langsung logout otomatis</h4>
+            <p><strong>Solusi:</strong></p>
+            <ol>
+                <li>Clear browser cookies & cache</li>
+                <li>Pastikan browser allow cookies</li>
+                <li>Disable browser extensions yang block cookies</li>
+                <li>Coba incognito/private mode</li>
+            </ol>
+        </div>
+
+        <h3>Masalah Database</h3>
+
+        <div class="warning-box">
+            <h4>⚠️ Gejala: Error "Koneksi database gagal"</h4>
+            <p><strong>Solusi (Admin/Developer):</strong></p>
+            <ol>
+                <li>Cek file <code>config.php</code> - pastikan kredensial benar</li>
+                <li>Pastikan MySQL service running</li>
+                <li>Cek hostname: localhost atau 127.0.0.1</li>
+                <li>Periksa user database memiliki privilege</li>
+            </ol>
+        </div>
+
+        <div class="warning-box">
+            <h4>⚠️ Gejala: Error "Table doesn't exist"</h4>
+            <p><strong>Solusi (Admin):</strong></p>
+            <ol>
+                <li>Import database <code>db_pa_akademi.sql</code> dengan benar</li>
+                <li>Periksa nama database di <code>config.php</code></li>
+                <li>Pastikan semua tabel sudah ter-create</li>
+            </ol>
+        </div>
+
+        <h3>Masalah Upload</h3>
+
+        <div class="warning-box">
+            <h4>⚠️ Gejala: "Failed to move uploaded file"</h4>
+            <p><strong>Solusi:</strong></p>
+            <ol>
+                <li>Cek permission folder (chmod 777 untuk testing)</li>
+                <li>Pastikan folder <code>dokumen/</code> dan <code>assets/uploads/</code> ada</li>
+                <li>Periksa PHP <code>upload_max_filesize</code> dan <code>post_max_size</code></li>
+            </ol>
+        </div>
+
+        <h3>Masalah Tampilan</h3>
+
+        <div class="warning-box">
+            <h4>⚠️ Gejala: Layout berantakan, CSS tidak load</h4>
+            <p><strong>Solusi:</strong></p>
+            <ol>
+                <li>Hard refresh (Ctrl+Shift+R)</li>
+                <li>Clear browser cache</li>
+                <li>Cek koneksi internet (CDN Bootstrap)</li>
+                <li>Periksa console browser untuk error (F12)</li>
+            </ol>
+        </div>
+
+        <div class="warning-box">
+            <h4>⚠️ Gejala: Chart tidak muncul di dashboard mahasiswa</h4>
+            <p><strong>Solusi:</strong></p>
+            <ol>
+                <li>Pastikan ada data riwayat akademik</li>
+                <li>Periksa JavaScript console error (F12)</li>
+                <li>Pastikan ChartJS library loaded (lihat Network tab)</li>
+            </ol>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h2>23. Kontak Support</h2>
+
+        <h3>Hubungi Kami</h3>
+
+        <div class="info-box">
+            <h4>📞 Pusat Bantuan SMART-BA</h4>
+            <table style="margin: 0; border: none;">
+                <tr style="background: transparent;">
+                    <td style="border: none; padding: 8px 12px 8px 0;"><strong>📞 Telepon:</strong></td>
+                    <td style="border: none; padding: 8px 0;">+62821-93362277</td>
+                </tr>
+                <tr style="background: transparent;">
+                    <td style="border: none; padding: 8px 12px 8px 0;"><strong>📧 Email:</strong></td>
+                    <td style="border: none; padding: 8px 0;">kontak@uinpalopo.ac.id</td>
+                </tr>
+                <tr style="background: transparent;">
+                    <td style="border: none; padding: 8px 12px 8px 0;"><strong>📍 Alamat:</strong></td>
+                    <td style="border: none; padding: 8px 0;">Jalan Agatis, Kelurahan Balandai, Kecamatan Bara, Kota Palopo, Sulawesi Selatan</td>
+                </tr>
+            </table>
+        </div>
+
+        <h3>Jam Operasional</h3>
+
+        <table>
+            <tr>
+                <th>Hari</th>
+                <th>Jam</th>
+            </tr>
+            <tr>
+                <td>Senin - Jumat</td>
+                <td>08:00 - 16:00 WITA</td>
+            </tr>
+            <tr>
+                <td>Sabtu</td>
+                <td>08:00 - 12:00 WITA</td>
+            </tr>
+            <tr>
+                <td>Minggu & Libur</td>
+                <td>Tutup</td>
+            </tr>
+        </table>
+
+        <h3>Kontak Khusus</h3>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h4>🖥️ IT Support</h4>
+                <p>Untuk masalah teknis sistem (bug, error, akses):</p>
+                <p><strong>Email:</strong> it.support@uinpalopo.ac.id<br>
+                <strong>WhatsApp:</strong> +62812-XXXX-XXXX</p>
+            </div>
+            <div class="feature-card">
+                <h4>📋 Admin Akademik</h4>
+                <p>Untuk masalah data mahasiswa, dosen PA, prodi:</p>
+                <p><strong>Email:</strong> admin.akademik@uinpalopo.ac.id<br>
+                <strong>Kontak:</strong> +62813-XXXX-XXXX</p>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- PENUTUP -->
+        <div class="success-box" style="text-align: center; padding: 40px;">
+            <h2 style="color: #00A86B; margin-bottom: 20px;">🎉 Selamat Menggunakan Sistem SMART-BA!</h2>
+            <p style="font-size: 13pt; margin-bottom: 20px;">Sistem ini dirancang untuk memudahkan proses bimbingan akademik dan meningkatkan kualitas interaksi antara dosen dan mahasiswa.</p>
+            <p style="font-size: 12pt; margin-bottom: 30px;">Jika ada pertanyaan lebih lanjut, jangan ragu menghubungi tim support.</p>
+            <p style="font-size: 14pt; font-weight: 700; color: #00A86B;">Mari bersama wujudkan Smart & Green Campus UIN Palopo! 🌿🎓</p>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p><strong>Panduan Lengkap Sistem SMART-BA</strong></p>
+            <p>Fakultas Syariah - Universitas Islam Negeri Palopo</p>
+            <p style="margin-top: 15px; font-size: 8pt; opacity: 0.7;">
+    
+                Created by Zuhal Samas | November 2025 | © All rights reserved.
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        // Add page numbers for printing
+        window.addEventListener('load', function() {
+            console.log('Panduan SMART-BA loaded successfully!');
+        });
+
+        // Print button functionality (optional)
+        function printDocument() {
+            window.print();
+        }
+
+        // Smooth scroll for internal links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

@@ -2,10 +2,8 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-// Tentukan judul halaman sebelum memanggil header
 $page_title = 'Lengkapi Riwayat Akademik';
 
-// Include konfigurasi database (otomatis XAMPP atau InfinityFree)
 require_once 'config.php';
 require 'templates/header.php';
 
@@ -17,18 +15,63 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] != 'mahasiswa') {
 
 $nim_mahasiswa_login = $_SESSION['user_id'];
 $pesan_sukses = '';
+$pesan_error = '';
 
 // Validasi input
 if (empty($nim_mahasiswa_login)) {
     die('Error: NIM mahasiswa tidak valid');
 }
 
-// Proses penyimpanan data
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+// PROSES HAPUS DATA (DELETE via AJAX)
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'delete_semester') {
+    $semester = intval($_POST['semester']);
+    
+    $stmt_delete = $conn->prepare("DELETE FROM riwayat_akademik WHERE nim_mahasiswa = ? AND semester = ?");
+    $stmt_delete->bind_param("si", $nim_mahasiswa_login, $semester);
+    
+    if ($stmt_delete->execute()) {
+        // Recalculate IPK setelah delete
+        $stmt_calc = $conn->prepare("
+            SELECT ip_semester, sks_semester 
+            FROM riwayat_akademik 
+            WHERE nim_mahasiswa = ? AND ip_semester > 0 AND sks_semester > 0
+        ");
+        $stmt_calc->bind_param("s", $nim_mahasiswa_login);
+        $stmt_calc->execute();
+        $result_calc = $stmt_calc->get_result();
+        
+        $total_sks = 0;
+        $total_bobot = 0;
+        
+        while ($row = $result_calc->fetch_assoc()) {
+            $total_sks += $row['sks_semester'];
+            $total_bobot += ($row['ip_semester'] * $row['sks_semester']);
+        }
+        $stmt_calc->close();
+        
+        $ipk_final = ($total_sks > 0) ? ($total_bobot / $total_sks) : 0;
+        
+        // Update mahasiswa table
+        $stmt_update = $conn->prepare("UPDATE mahasiswa SET ipk = ?, total_sks = ? WHERE nim = ?");
+        $ipk_formatted = round($ipk_final, 2);
+        $stmt_update->bind_param("dis", $ipk_formatted, $total_sks, $nim_mahasiswa_login);
+        $stmt_update->execute();
+        $stmt_update->close();
+        
+        echo json_encode(['success' => true, 'message' => 'Data semester ' . $semester . ' berhasil dihapus!']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Gagal menghapus data: ' . $stmt_delete->error]);
+    }
+    $stmt_delete->close();
+    $conn->close();
+    exit();
+}
+
+// PROSES PENYIMPANAN DATA
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($_POST['action'])) {
     $ips_values = $_POST['ips'] ?? [];
     $sks_values = $_POST['sks'] ?? [];
 
-    // Gunakan prepared statement untuk INSERT dengan ON DUPLICATE KEY UPDATE
     $stmt = $conn->prepare("
         INSERT INTO riwayat_akademik (nim_mahasiswa, semester, ip_semester, sks_semester) 
         VALUES (?, ?, ?, ?) 
@@ -41,19 +84,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         die('Error: ' . $conn->error);
     }
 
-    // Proses penyimpanan untuk setiap semester
+    $data_saved = 0;
+    $data_deleted = 0;
+    
+    // CARA 1: Auto-delete jika field dikosongkan
     for ($i = 1; $i <= 14; $i++) {
-        if (isset($ips_values[$i]) && !empty($ips_values[$i]) && 
-            isset($sks_values[$i]) && !empty($sks_values[$i])) {
-            
-            // Validasi dan konversi IP
-            $ip = floatval(str_replace(',', '.', $ips_values[$i]));
-            $sks = intval($sks_values[$i]);
+        $ip_value = trim($ips_values[$i] ?? '');
+        $sks_value = trim($sks_values[$i] ?? '');
+        
+        // Jika KEDUA field kosong DAN data existing ada -> DELETE
+        if (empty($ip_value) && empty($sks_value)) {
+            $stmt_del = $conn->prepare("DELETE FROM riwayat_akademik WHERE nim_mahasiswa = ? AND semester = ?");
+            $stmt_del->bind_param("si", $nim_mahasiswa_login, $i);
+            if ($stmt_del->execute() && $stmt_del->affected_rows > 0) {
+                $data_deleted++;
+            }
+            $stmt_del->close();
+            continue;
+        }
+        
+        // Jika ada nilai -> UPSERT
+        if (!empty($ip_value) && !empty($sks_value)) {
+            $ip = floatval(str_replace(',', '.', $ip_value));
+            $sks = intval($sks_value);
 
-            // Validasi range
             if ($ip > 0 && $ip <= 4.0 && $sks > 0 && $sks <= 24) {
                 $stmt->bind_param("sidi", $nim_mahasiswa_login, $i, $ip, $sks);
-                if (!$stmt->execute()) {
+                if ($stmt->execute()) {
+                    $data_saved++;
+                } else {
                     error_log("Error executing INSERT: " . $stmt->error);
                 }
             }
@@ -61,9 +120,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     $stmt->close();
 
-    $pesan_sukses = "Data riwayat akademik Anda telah berhasil diperbarui!";
+    if ($data_saved > 0 || $data_deleted > 0) {
+        $pesan_sukses = "✅ ";
+        if ($data_saved > 0) $pesan_sukses .= "$data_saved semester disimpan. ";
+        if ($data_deleted > 0) $pesan_sukses .= "$data_deleted semester dihapus. ";
+    } else {
+        $pesan_error = "⚠️ Tidak ada perubahan data.";
+    }
 
-    // Perhitungan IPK & SKS Otomatis dengan prepared statement
+    // Perhitungan IPK & SKS Otomatis
     $stmt_riwayat = $conn->prepare("
         SELECT ip_semester, sks_semester 
         FROM riwayat_akademik 
@@ -90,11 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $ipk_baru = ($total_sks > 0) ? ($total_bobot_kali_sks / $total_sks) : 0;
 
     // Update IPK dan total SKS di tabel mahasiswa
-    $update_stmt = $conn->prepare("
-        UPDATE mahasiswa 
-        SET ipk = ?, total_sks = ? 
-        WHERE nim = ?
-    ");
+    $update_stmt = $conn->prepare("UPDATE mahasiswa SET ipk = ?, total_sks = ? WHERE nim = ?");
 
     if (!$update_stmt) {
         die('Error: ' . $conn->error);
@@ -102,13 +163,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $ipk_formatted = number_format($ipk_baru, 2, '.', '');
     $update_stmt->bind_param("dis", $ipk_formatted, $total_sks, $nim_mahasiswa_login);
-    if (!$update_stmt->execute()) {
+    if ($update_stmt->execute()) {
+        $pesan_sukses .= "IPK: $ipk_formatted | Total SKS: $total_sks";
+    } else {
         error_log("Error updating IPK: " . $update_stmt->error);
     }
     $update_stmt->close();
 }
 
-// Ambil data riwayat yang sudah ada dengan prepared statement
+// Ambil data riwayat yang sudah ada
 $stmt_fetch = $conn->prepare("
     SELECT semester, ip_semester, sks_semester 
     FROM riwayat_akademik 
@@ -142,7 +205,7 @@ $ipk_preview = ($total_sks_preview > 0) ? ($total_bobot_preview / $total_sks_pre
 ?>
 
 <style>
-    /* ========== IMPROVED RIWAYAT AKADEMIK CSS ========== */
+    /* ========== SEMUA CSS ANDA (TETAP SAMA) ========== */
     :root {
         --campus-green: #049D6F;
         --smart-blue: #0d6efd;
@@ -160,7 +223,6 @@ $ipk_preview = ($total_sks_preview > 0) ? ($total_bobot_preview / $total_sks_pre
         min-height: 100vh;
     }
     
-    /* ========== HEADER SECTION ========== */
     .page-header {
         background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
         border-radius: var(--card-radius);
@@ -204,7 +266,6 @@ $ipk_preview = ($total_sks_preview > 0) ? ($total_bobot_preview / $total_sks_pre
         z-index: 1;
     }
     
-    /* ========== STATS PREVIEW CARDS ========== */
     .stats-preview {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -271,7 +332,6 @@ $ipk_preview = ($total_sks_preview > 0) ? ($total_bobot_preview / $total_sks_pre
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
     
-    /* ========== CARD IMPROVEMENTS ========== */
     .card {
         border: none;
         border-radius: var(--card-radius);
@@ -288,7 +348,6 @@ $ipk_preview = ($total_sks_preview > 0) ? ($total_bobot_preview / $total_sks_pre
         padding: 2rem;
     }
     
-    /* ========== TABLE IMPROVEMENTS ========== */
     .table-responsive {
         border-radius: 0.75rem;
         overflow: hidden;
@@ -348,7 +407,6 @@ $ipk_preview = ($total_sks_preview > 0) ? ($total_bobot_preview / $total_sks_pre
         border-radius: 0 4px 4px 0;
     }
     
-    /* ========== FORM IMPROVEMENTS ========== */
     .form-control {
         border-radius: 0.5rem;
         border: 2px solid var(--gray);
@@ -373,7 +431,6 @@ $ipk_preview = ($total_sks_preview > 0) ? ($total_bobot_preview / $total_sks_pre
         font-weight: 500;
     }
     
-    /* ========== BUTTON IMPROVEMENTS ========== */
     .btn {
         border-radius: 0.5rem;
         font-weight: 700;
@@ -422,7 +479,24 @@ $ipk_preview = ($total_sks_preview > 0) ? ($total_bobot_preview / $total_sks_pre
         box-shadow: 0 4px 15px rgba(4, 157, 111, 0.3);
     }
     
-    /* ========== ALERT IMPROVEMENTS ========== */
+    /* TOMBOL HAPUS (NEW) */
+    .btn-delete {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 0.4rem;
+        border: none;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .btn-delete:hover {
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    }
+    
     .alert {
         border-radius: 0.75rem;
         border: none;
@@ -458,7 +532,12 @@ $ipk_preview = ($total_sks_preview > 0) ? ($total_bobot_preview / $total_sks_pre
         color: #10b981;
     }
     
-    /* ========== HELPER TEXT ========== */
+    .alert-danger {
+        background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%);
+        color: #7f1d1d;
+        border-left-color: #ef4444;
+    }
+    
     .helper-box {
         background: linear-gradient(135deg, #fff3cd 0%, #fff8e1 100%);
         border-left: 4px solid #ffc107;
@@ -492,7 +571,6 @@ $ipk_preview = ($total_sks_preview > 0) ? ($total_bobot_preview / $total_sks_pre
         color: #333;
     }
     
-    /* ========== LOADING STATE ========== */
     .btn-loading {
         position: relative;
         pointer-events: none;
@@ -517,7 +595,6 @@ $ipk_preview = ($total_sks_preview > 0) ? ($total_bobot_preview / $total_sks_pre
         to { transform: rotate(360deg); }
     }
     
-    /* ========== RESPONSIVE IMPROVEMENTS ========== */
     @media (max-width: 768px) {
         body {
             background: var(--light-gray);
@@ -551,7 +628,6 @@ $ipk_preview = ($total_sks_preview > 0) ? ($total_bobot_preview / $total_sks_pre
         }
     }
     
-    /* ========== SCROLLBAR STYLING ========== */
     ::-webkit-scrollbar {
         width: 10px;
         height: 10px;
@@ -573,7 +649,6 @@ $ipk_preview = ($total_sks_preview > 0) ? ($total_bobot_preview / $total_sks_pre
 </style>
 
 <div class="container my-5">
-    <!-- Header Section -->
     <div class="page-header">
         <h1><i class="bi bi-journal-text me-2"></i>Lengkapi Riwayat Akademik</h1>
         <p class="subtitle">
@@ -582,7 +657,6 @@ $ipk_preview = ($total_sks_preview > 0) ? ($total_bobot_preview / $total_sks_pre
         </p>
     </div>
 
-    <!-- Stats Preview -->
     <?php if (count($riwayat_tersimpan) > 0): ?>
     <div class="stats-preview">
         <div class="stat-preview-card">
@@ -603,7 +677,6 @@ $ipk_preview = ($total_sks_preview > 0) ? ($total_bobot_preview / $total_sks_pre
     </div>
     <?php endif; ?>
 
-    <!-- Helper Box -->
     <div class="helper-box">
         <div class="d-flex align-items-start">
             <div class="icon"><i class="bi bi-lightbulb-fill"></i></div>
@@ -613,17 +686,20 @@ $ipk_preview = ($total_sks_preview > 0) ? ($total_bobot_preview / $total_sks_pre
                     <li>Gunakan tanda titik (.) atau koma (,) untuk desimal. Contoh: <code>3.45</code> atau <code>3,45</code></li>
                     <li>IP Semester bernilai antara 0.00 - 4.00</li>
                     <li>SKS maksimal per semester umumnya 24 SKS</li>
-                    <li>Kosongkan semester yang belum/tidak ditempuh</li>
+                    <li><strong>Untuk menghapus data:</strong> Kosongkan kedua field IP & SKS lalu klik Simpan, ATAU klik tombol "Hapus"</li>
                 </ul>
             </div>
         </div>
     </div>
 
-    <!-- Main Card -->
     <div class="card shadow-sm">
         <div class="card-body">
             <?php if (!empty($pesan_sukses)): ?>
                 <div class="alert alert-success"><?= htmlspecialchars($pesan_sukses); ?></div>
+            <?php endif; ?>
+            
+            <?php if (!empty($pesan_error)): ?>
+                <div class="alert alert-danger"><?= htmlspecialchars($pesan_error); ?></div>
             <?php endif; ?>
             
             <form method="POST" action="input_riwayat.php" id="formRiwayat">
@@ -631,14 +707,15 @@ $ipk_preview = ($total_sks_preview > 0) ? ($total_bobot_preview / $total_sks_pre
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th style="width: 30%;"><i class="bi bi-calendar3 me-2"></i>Semester</th>
-                                <th style="width: 35%;"><i class="bi bi-graph-up me-2"></i>Indeks Prestasi (IP)</th>
-                                <th style="width: 35%;"><i class="bi bi-stack me-2"></i>Jumlah SKS</th>
+                                <th style="width: 25%;"><i class="bi bi-calendar3 me-2"></i>Semester</th>
+                                <th style="width: 30%;"><i class="bi bi-graph-up me-2"></i>Indeks Prestasi (IP)</th>
+                                <th style="width: 30%;"><i class="bi bi-stack me-2"></i>Jumlah SKS</th>
+                                <th style="width: 15%;"><i class="bi bi-gear me-2"></i>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php for ($i = 1; $i <= 14; $i++): ?>
-                                <tr>
+                                <tr data-semester="<?= $i ?>">
                                     <td><strong>Semester <?= $i; ?></strong></td>
                                     <td>
                                         <input type="text" 
@@ -658,6 +735,15 @@ $ipk_preview = ($total_sks_preview > 0) ? ($total_bobot_preview / $total_sks_pre
                                                placeholder="0 - 24" 
                                                value="<?= htmlspecialchars($riwayat_tersimpan[$i]['sks_semester'] ?? ''); ?>"
                                                data-semester="<?= $i; ?>">
+                                    </td>
+                                    <td>
+                                        <?php if (isset($riwayat_tersimpan[$i])): ?>
+                                            <button type="button" 
+                                                    class="btn-delete" 
+                                                    onclick="deleteSemester(<?= $i ?>)">
+                                                <i class="bi bi-trash me-1"></i>Hapus
+                                            </button>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endfor; ?>
@@ -729,7 +815,6 @@ document.addEventListener('DOMContentLoaded', function() {
         btnSubmit.disabled = true;
         btnSubmit.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Menyimpan...';
         
-        // Backup: re-enable after 10 seconds
         setTimeout(() => {
             btnSubmit.classList.remove('btn-loading');
             btnSubmit.disabled = false;
@@ -811,6 +896,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 3000);
     }
     
+    // Make showToast global
+    window.showToast = showToast;
+    
     // Animation keyframes
     const style = document.createElement('style');
     style.textContent = `
@@ -829,10 +917,48 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     document.head.appendChild(style);
 });
+
+// DELETE SEMESTER FUNCTION (AJAX) - FIXED
+function deleteSemester(semester) {
+    if (!confirm(`Yakin ingin menghapus data Semester ${semester}?`)) {
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('semester', semester);
+    
+    fetch('delete_riwayat_mahasiswa.php', {  // ← UBAH KE FILE TERPISAH
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        return response.text().then(text => {
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                console.error('Response:', text);
+                throw new Error('Server mengirim HTML, bukan JSON');
+            }
+        });
+    })
+    .then(data => {
+        if (data.success) {
+            showToast(data.message, 'success');
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        } else {
+            showToast(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Error: ' + error.message, 'error');
+    });
+}
 </script>
 
 <?php 
-// Tutup koneksi
 $conn->close();
 require 'templates/footer.php';
 ?>
