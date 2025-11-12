@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sertifikat Prestasi - ELSA RINDIANI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .certificate {
+            background: white;
+            width: 100%;
+            max-width: 900px;
+            padding: 60px 80px;
+            border: 15px solid #00A86B;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .certificate::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(0, 168, 107, 0.03) 10px,
+                rgba(0, 168, 107, 0.03) 20px
+            );
+            z-index: 0;
+        }
+        
+        .certificate-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+        
+        .header {
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #00A86B, #008F5A);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .title {
+            font-family: 'Playfair Display', serif;
+            font-size: 48px;
+            color: #00A86B;
+            margin-bottom: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        .subtitle {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 40px;
+            font-weight: 400;
+        }
+        
+        .divider {
+            width: 200px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #00A86B, transparent);
+            margin: 20px auto;
+        }
+        
+        .body-text {
+            font-size: 16px;
+            color: #444;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+        
+        .recipient-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 52px;
+            color: #222;
+            font-weight: 700;
+            margin: 30px 0;
+            text-decoration: underline;
+            text-decoration-color: #00A86B;
+            text-decoration-thickness: 3px;
+            text-underline-offset: 10px;
+        }
+        
+        .achievement {
+            font-size: 20px;
+            color: #333;
+            margin: 30px 0;
+            font-weight: 600;
+        }
+        
+        .event-name {
+            color: #00A86B;
+            font-weight: 700;
+            font-size: 24px;
+        }
+        
+        .footer {
+            margin-top: 50px;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+        }
+        
+        .signature-block {
+            text-align: center;
+            padding: 0 20px;
+        }
+        
+        .signature-line {
+            width: 200px;
+            height: 2px;
+            background: #333;
+            margin: 60px auto 10px;
+        }
+        
+        .signature-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #222;
+        }
+        
+        .signature-title {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .date {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .seal {
+            position: absolute;
+            bottom: 40px;
+            right: 80px;
+            width: 120px;
+            height: 120px;
+            border: 8px solid #00A86B;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #00A86B;
+            font-size: 14px;
+            text-align: center;
+            transform: rotate(-15deg);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .certificate {
+                box-shadow: none;
+                border: 10px solid #00A86B;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .certificate {
+                padding: 40px 30px;
+                border-width: 10px;
+            }
+            .title {
+                font-size: 32px;
+            }
+            .recipient-name {
+                font-size: 36px;
+            }
+            .footer {
+                flex-direction: column;
+                gap: 30px;
+            }
+            .seal {
+                right: 30px;
+                width: 100px;
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="certificate">
+        <div class="certificate-content">
+            <div class="header">
+                <div class="logo">🏆</div>
+                <h1 class="title">Sertifikat Prestasi</h1>
+                <p class="subtitle">Certificate of Achievement</p>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <p class="body-text">Dengan bangga diberikan kepada:</p>
+            
+            <h2 class="recipient-name">ELSA RINDIANI</h2>
+            
+            <p class="body-text">
+                Atas prestasi gemilang dalam meraih
+            </p>
+            
+            <p class="achievement">
+                <strong>Juara Terbaik</strong><br>
+                <span class="event-name">Lomba Debat Nasional 2025</span>
+            </p>
+            
+            <p class="body-text">
+                Sebagai bentuk apresiasi atas dedikasi, keterampilan, dan semangat yang luar biasa<br>
+                dalam kompetisi debat tingkat nasional.
+            </p>
+            
+            <div class="divider"></div>
+            
+            <div class="footer">
+                <div class="signature-block">
+                    <div class="signature-line"></div>
+                    <p class="signature-name">Dr. Ahmad Suryadi, M.Pd</p>
+                    <p class="signature-title">Ketua Panitia</p>
+                </div>
+                
+                <div class="signature-block">
+                    <div class="signature-line"></div>
+                    <p class="signature-name">Prof. Siti Aminah, Ph.D</p>
+                    <p class="signature-title">Ketua Dewan Juri</p>
+                </div>
+            </div>
+            
+            <p class="date">
+                Palopo, 12 November 2025
+            </p>
+        </div>
+        
+        <div class="seal">
+            OFFICIAL<br>SEAL
+        </div>
+    </div>
+</body>
+</html>

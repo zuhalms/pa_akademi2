@@ -686,7 +686,31 @@ $jumlah_notif_nilai = $result_nilai_bermasalah ? $result_nilai_bermasalah->num_r
                     <?php endif; ?>
                 </div>
             </div>
-            <div class="card shadow-sm mb-4"><div class="card-header"><h5><i class="bi bi-folder-fill me-2"></i>Dokumen (<?= $jumlah_dokumen; ?>)</h5></div><div class="list-group list-group-flush"><?php if ($result_dokumen && $result_dokumen->num_rows > 0): while($dokumen = $result_dokumen->fetch_assoc()): ?><a href="<?= htmlspecialchars($dokumen['path_file']); ?>" class="list-group-item list-group-item-action" download><div class="d-flex justify-content-between align-items-start"><div><strong class="d-block"><?= htmlspecialchars($dokumen['judul_dokumen']); ?></strong><small class="text-muted"><?= formatBytes($dokumen['ukuran_file']); ?> | <?= date('d M Y', strtotime($dokumen['tanggal_unggah'])); ?></small></div><i class="bi bi-download fs-5 text-primary"></i></div></a><?php endwhile; else: ?><div class="list-group-item text-center text-muted">Belum ada dokumen terunggah.</div><?php endif; ?></div></div>
+           <div class="card shadow-sm mb-4">
+    <div class="card-header">
+        <h5><i class="bi bi-folder-fill me-2"></i>Dokumen (<?= $jumlah_dokumen; ?>)</h5>
+    </div>
+    <div class="list-group list-group-flush">
+        <?php if ($result_dokumen && $result_dokumen->num_rows > 0): ?>
+            <?php while($dokumen = $result_dokumen->fetch_assoc()): ?>
+                <a href="<?= htmlspecialchars($dokumen['path_file']); ?>" 
+                   class="list-group-item list-group-item-action" 
+                   target="_blank" rel="noopener noreferrer">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong class="d-block"><?= htmlspecialchars($dokumen['judul_dokumen']); ?></strong>
+                            <small class="text-muted"><?= formatBytes($dokumen['ukuran_file']); ?> | <?= date('d M Y', strtotime($dokumen['tanggal_unggah'])); ?></small>
+                        </div>
+                        <i class="bi bi-file-earmark-text fs-5 text-primary"></i>
+                    </div>
+                </a>
+            <?php endwhile; ?>
+        <?php else: ?>
+            <div class="list-group-item text-center text-muted">Belum ada dokumen terunggah.</div>
+        <?php endif; ?>
+    </div>
+</div>
+
 
             <div class="card shadow-sm">
                 <div class="card-header"><h5><i class="bi bi-trophy-fill me-2"></i>Pencapaian</h5></div>
