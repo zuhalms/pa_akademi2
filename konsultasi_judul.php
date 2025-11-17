@@ -35,6 +35,7 @@ $error_message   = $_SESSION['error'] ?? '';
 unset($_SESSION['success'], $_SESSION['error']);
 ?>
 
+
 <style>
     :root {
         --campus-green: #049D6F;
@@ -132,6 +133,7 @@ unset($_SESSION['success'], $_SESSION['error']);
     .status-ditolak   { background: #fee2e2; color: #991b1b; }
     .status-revisi    { background: #dbeafe; color: #1e40af; }
 
+
     .alert {
         border-radius: 0.75rem;
         border: none;
@@ -178,6 +180,18 @@ unset($_SESSION['success'], $_SESSION['error']);
         box-shadow: 0 4px 12px rgba(4, 157, 111, 0.4);
     }
 
+    /* Tambahan untuk tombol cetak */
+    .btn-cetak {
+        background-color: #28a745; /* hijau cerah */
+        color: white !important;
+        border-color: #28a745 !important;
+    }
+    .btn-cetak:hover {
+        background-color: #218838; /* hijau gelap */
+        border-color: #1e7e34 !important;
+        color: white !important;
+    }
+
     .empty-state {
         text-align: center;
         padding: 4rem 2rem;
@@ -201,6 +215,7 @@ unset($_SESSION['success'], $_SESSION['error']);
         }
     }
 </style>
+
 
 <div class="container my-4">
     <!-- PAGE HEADER -->
@@ -277,95 +292,94 @@ unset($_SESSION['success'], $_SESSION['error']);
                 </div>
             </div>
 
-          <!-- RIWAYAT KONSULTASI -->
-<div class="card">
-    <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem;">
-        <h5 class="mb-0">
-            <i class="bi bi-clock-history me-2"></i>Riwayat Konsultasi
-        </h5>
-    </div>
-    <div class="card-body" style="padding: 2rem;">
-        <?php if (count($konsultasi_list) > 0): ?>
-            <?php foreach ($konsultasi_list as $konsultasi): ?>
-                <?php
-                    // Normalisasi status untuk class CSS (lowercase & ganti spasi jadi strip)
-                    $status_raw   = $konsultasi['status'] ?? '';
-                    $status_class = 'status-' . strtolower(str_replace(' ', '-', $status_raw));
+            <!-- RIWAYAT KONSULTASI -->
+            <div class="card">
+                <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem;">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clock-history me-2"></i>Riwayat Konsultasi
+                    </h5>
+                </div>
+                <div class="card-body" style="padding: 2rem;">
+                    <?php if (count($konsultasi_list) > 0): ?>
+                        <?php foreach ($konsultasi_list as $konsultasi): ?>
+                            <?php
+                                $status_raw   = $konsultasi['status'] ?? '';
+                                $status_class = 'status-' . strtolower(str_replace(' ', '-', $status_raw));
+                                $status_upper = strtoupper(trim($status_raw));
+                                $boleh_cetak  = ($status_upper === 'DISETUJUI');
+                            ?>
+                            <div class="konsultasi-item">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="flex-grow-1">
+                                        <h5 class="mb-2 fw-bold">
+                                            <?= htmlspecialchars($konsultasi['judul_usulan']); ?>
+                                        </h5>
+                                        <p class="text-muted mb-2">
+                                            <i class="bi bi-calendar3"></i>
+                                            <?= date('d F Y, H:i', strtotime($konsultasi['tanggal_pengajuan'])); ?> WIB
+                                        </p>
+                                    </div>
+                                    <span class="status-badge <?= $status_class; ?>">
+                                        <?= htmlspecialchars($status_raw); ?>
+                                    </span>
+                                </div>
 
-                    // Hanya boleh cetak jika status disetujui
-                    $status_upper = strtoupper(trim($status_raw));
-                    $boleh_cetak  = ($status_upper === 'DISETUJUI');
-                ?>
-                <div class="konsultasi-item">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
-                        <div class="flex-grow-1">
-                            <h5 class="mb-2 fw-bold">
-                                <?= htmlspecialchars($konsultasi['judul_usulan']); ?>
-                            </h5>
-                            <p class="text-muted mb-2">
-                                <i class="bi bi-calendar3"></i>
-                                <?= date('d F Y, H:i', strtotime($konsultasi['tanggal_pengajuan'])); ?> WIB
-                            </p>
-                        </div>
-                        <span class="status-badge <?= $status_class; ?>">
-                            <?= htmlspecialchars($status_raw); ?>
-                        </span>
-                    </div>
+                                <?php if (!empty($konsultasi['deskripsi'])): ?>
+                                    <div class="mb-3">
+                                        <strong>Deskripsi:</strong>
+                                        <p class="mb-0 mt-1">
+                                            <?= nl2br(htmlspecialchars($konsultasi['deskripsi'])); ?>
+                                        </p>
+                                    </div>
+                                <?php endif; ?>
 
-                    <?php if (!empty($konsultasi['deskripsi'])): ?>
-                        <div class="mb-3">
-                            <strong>Deskripsi:</strong>
-                            <p class="mb-0 mt-1">
-                                <?= nl2br(htmlspecialchars($konsultasi['deskripsi'])); ?>
-                            </p>
-                        </div>
-                    <?php endif; ?>
+                                <?php if (!empty($konsultasi['catatan_dosen'])): ?>
+                                    <div class="alert alert-info mb-0">
+                                        <strong>
+                                            <i class="bi bi-chat-left-quote"></i> Tanggapan Dosen PA:
+                                        </strong>
+                                        <p class="mb-1 mt-2">
+                                            <?= nl2br(htmlspecialchars($konsultasi['catatan_dosen'])); ?>
+                                        </p>
+                                        <?php if (!empty($konsultasi['tanggal_respon'])): ?>
+                                            <small class="text-muted">
+                                                <i class="bi bi-person"></i>
+                                                <?= htmlspecialchars($konsultasi['nama_dosen'] ?? 'Dosen PA'); ?>
+                                                &mdash;
+                                                <?= date('d F Y, H:i', strtotime($konsultasi['tanggal_respon'])); ?> WIB
+                                            </small>
+                                        <?php else: ?>
+                                            <small class="text-muted">
+                                                <i class="bi bi-person"></i>
+                                                <?= htmlspecialchars($konsultasi['nama_dosen'] ?? 'Dosen PA'); ?>
+                                            </small>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endif; ?>
 
-                    <?php if (!empty($konsultasi['catatan_dosen'])): ?>
-                        <div class="alert alert-info mb-0">
-                            <strong>
-                                <i class="bi bi-chat-left-quote"></i> Tanggapan Dosen PA:
-                            </strong>
-                            <p class="mb-1 mt-2">
-                                <?= nl2br(htmlspecialchars($konsultasi['catatan_dosen'])); ?>
-                            </p>
-                            <?php if (!empty($konsultasi['tanggal_respon'])): ?>
-                                <small class="text-muted">
-                                    <i class="bi bi-person"></i>
-                                    <?= htmlspecialchars($konsultasi['nama_dosen'] ?? 'Dosen PA'); ?>
-                                    &mdash;
-                                    <?= date('d F Y, H:i', strtotime($konsultasi['tanggal_respon'])); ?> WIB
-                                </small>
-                            <?php else: ?>
-                                <small class="text-muted">
-                                    <i class="bi bi-person"></i>
-                                    <?= htmlspecialchars($konsultasi['nama_dosen'] ?? 'Dosen PA'); ?>
-                                </small>
-                            <?php endif; ?>
-                        </div>
-                    <?php endif; ?>
-
-                    <?php if ($boleh_cetak): ?>
-                        <div class="mt-3 d-flex justify-content-end">
-                            <a href="cetak_konsultasi_judul.php?id=<?= urlencode($konsultasi['id_konsultasi']); ?>"
-                               target="_blank"
-                               class="btn btn-outline-secondary btn-sm">
-                                <i class="bi bi-printer"></i> Cetak Persetujuan
-                            </a>
+                                <?php if ($boleh_cetak): ?>
+                                    <div class="mt-3 d-flex justify-content-end">
+                                        <a href="cetak_konsultasi_judul.php?id=<?= urlencode($konsultasi['id_konsultasi']); ?>"
+                                           target="_blank"
+                                           class="btn btn-outline-secondary btn-sm btn-cetak">
+                                            <i class="bi bi-printer"></i> Cetak Persetujuan
+                                        </a>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="empty-state">
+                            <i class="bi bi-inbox"></i>
+                            <h5 class="text-muted">Belum Ada Riwayat Konsultasi</h5>
+                            <p class="text-muted">Ajukan judul penelitian Anda di form di atas.</p>
                         </div>
                     <?php endif; ?>
                 </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <div class="empty-state">
-                <i class="bi bi-inbox"></i>
-                <h5 class="text-muted">Belum Ada Riwayat Konsultasi</h5>
-                <p class="text-muted">Ajukan judul penelitian Anda di form di atas.</p>
             </div>
-        <?php endif; ?>
+        </div>
     </div>
 </div>
-
 
 <?php
 $conn->close();
