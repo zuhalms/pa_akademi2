@@ -1,69 +1,83 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Validasi akses dosen
-if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'dosen' || !isset($_GET['nim'])) {
-    header("Location: dashboard_dosen.php");
-    exit();
-}
-
-$nim_mahasiswa = $_GET['nim'];
-$id_dosen_login = $_SESSION['user_id'];
-
+session_start();
 require_once 'config.php';
 
-// Ambil data mahasiswa
-$stmt_mhs = $conn->prepare("SELECT m.*, p.nama_prodi, d.nama_dosen, d.nip 
-                            FROM mahasiswa m 
-                            JOIN program_studi p ON m.id_prodi = p.id_prodi 
-                            JOIN dosen d ON m.id_dosen_pa = d.id_dosen 
-                            WHERE m.nim = ? AND m.id_dosen_pa = ?");
-$stmt_mhs->bind_param("si", $nim_mahasiswa, $id_dosen_login);
-$stmt_mhs->execute();
-$result_mhs = $stmt_mhs->get_result();
-
-if ($result_mhs->num_rows === 0) {
-    echo '<div class="alert alert-danger">Data mahasiswa tidak ditemukan atau Anda tidak memiliki hak akses.</div>';
+// Hanya mahasiswa yang boleh mencetak suratnya sendiri
+if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] ?? '') !== 'mahasiswa') {
+    header("Location: login.php");
     exit();
 }
 
-$mahasiswa = $result_mhs->fetch_assoc();
+$nim = $_SESSION['user_id'];
 
-// Ambil data konsultasi judul
-$result_konsultasi = null;
-$jumlah_konsultasi = 0;
-
-if($conn->query("SHOW TABLES LIKE 'konsultasi_judul'")->num_rows > 0) {
-    $stmt_konsul = $conn->prepare("SELECT * FROM konsultasi_judul WHERE nim = ? ORDER BY tanggal_pengajuan ASC");
-    $stmt_konsul->bind_param("s", $nim_mahasiswa);
-    $stmt_konsul->execute();
-    $result_konsultasi = $stmt_konsul->get_result();
-    $jumlah_konsultasi = $result_konsultasi->num_rows;
+// Pastikan ada id konsultasi
+if (!isset($_GET['id'])) {
+    echo "Parameter tidak lengkap.";
+    exit();
 }
 
-$tanggal_cetak = date('d F Y');
-?>
+$id_konsultasi = (int)$_GET['id'];
 
+// Ambil data konsultasi + mahasiswa + prodi + dosen
+$stmt = $conn->prepare("
+    SELECT 
+        k.id_konsultasi,
+        k.nim,
+        k.judul_usulan,
+        k.deskripsi,
+        k.status,
+        k.tanggal_pengajuan,
+        k.tanggal_respon,
+        k.catatan_dosen,
+        m.nama_mahasiswa,
+        p.nama_prodi,
+        d.nama_dosen
+    FROM konsultasi_judul k
+    JOIN mahasiswa m ON k.nim = m.nim
+    LEFT JOIN program_studi p ON m.id_prodi = p.id_prodi
+    LEFT JOIN dosen d ON k.id_dosen = d.id_dosen
+    WHERE k.id_konsultasi = ? AND k.nim = ?
+    LIMIT 1
+");
+$stmt->bind_param("is", $id_konsultasi, $nim);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows !== 1) {
+    echo "Data konsultasi tidak ditemukan atau Anda tidak berhak mengakses data ini.";
+    exit();
+}
+
+$data = $result->fetch_assoc();
+$stmt->close();
+
+// Hanya boleh cetak jika sudah Disetujui
+if (strtoupper(trim($data['status'])) !== 'DISETUJUI') {
+    echo "Judul ini belum berstatus Disetujui, sehingga belum dapat dicetak surat persetujuannya.";
+    exit();
+}
+
+// Siapkan tanggal tampil
+$tgl_pengajuan = date('d F Y', strtotime($data['tanggal_pengajuan']));
+$tgl_respon    = !empty($data['tanggal_respon'])
+    ? date('d F Y', strtotime($data['tanggal_respon']))
+    : '-';
+
+// Nama prodi dan dosen fallback
+$nama_prodi  = $data['nama_prodi']  ?: '-';
+$nama_dosen  = $data['nama_dosen']  ?: 'Dosen PA';
+$catatan_dsn = $data['catatan_dosen'] ?: '-';
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cetak Riwayat Konsultasi Judul - <?= htmlspecialchars($mahasiswa['nama_mahasiswa']); ?></title>
+    <title>Cetak Persetujuan Konsultasi Judul</title>
     <style>
-        @media print {
-            .no-print { display: none !important; }
-            body { margin: 0; padding: 15mm; }
-        }
-        
         @page {
-            size: A4;
-            margin: 20mm;
+            size: A4 portrait;
+            margin: 15mm 20mm 15mm 20mm;
         }
         
         * {
@@ -73,217 +87,168 @@ $tanggal_cetak = date('d F Y');
         }
         
         body {
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 12pt;
-            line-height: 1.6;
+            font-family: "Times New Roman", serif;
+            font-size: 11pt;
+            line-height: 1.5;
             color: #000;
-            background-color: #fff;
+            background: #fff;
+        }
+        
+        .container {
+            width: 100%;
             max-width: 210mm;
             margin: 0 auto;
-            padding: 20px;
         }
         
-        .header {
+        /* KOP SURAT */
+        .kop-surat {
             display: flex;
-            align-items: center;
-            margin-bottom: 20px;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
             border-bottom: 3px solid #000;
-            padding-bottom: 15px;
         }
         
-        .header-logo {
+        .kop-logo-left {
             flex-shrink: 0;
-            margin-right: -90px;
+            width: 70px;
+            text-align: center;
+            margin-right: 10px;
         }
         
-        .header-logo img {
-            width: 100px;
-            height: 100px;
+        .kop-logo-left img {
+            width: 65px;
+            height: 65px;
             object-fit: contain;
-            margin-left: 30px;
         }
         
-        .header-text {
+        .kop-text {
             flex-grow: 1;
             text-align: center;
+            padding: 0 10px;
         }
         
-        .header-text h1 {
-            font-size: 18pt;
+        .kop-text h3 {
+            margin: 0 0 0.2rem 0;
+            font-size: 13pt;
             font-weight: bold;
-            margin-bottom: 5px;
-            text-transform: uppercase;
+            line-height: 1.3;
         }
         
-        .header-text h2 {
-            font-size: 16pt;
+        .kop-text h4 {
+            margin: 0 0 0.2rem 0;
+            font-size: 12pt;
             font-weight: bold;
-            margin-bottom: 10px;
+            line-height: 1.3;
         }
         
-        .header-text p {
+        .kop-text h5 {
+            margin: 0 0 0.2rem 0;
             font-size: 11pt;
-            margin: 2px 0;
+            font-weight: bold;
+            line-height: 1.3;
         }
         
-        .info-mahasiswa {
-            margin: 25px 0;
-            background-color: #f8f9fa;
-            padding: 15px;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
+        .kop-text p {
+            margin: 0;
+            font-size: 9pt;
+            line-height: 1.3;
         }
         
-        .info-mahasiswa table {
+        .kop-logo-right {
+            flex-shrink: 0;
+            width: 70px;
+            text-align: center;
+            margin-left: 10px;
+        }
+        
+        .kop-logo-right img {
+            width: 65px;
+            height: 65px;
+            object-fit: contain;
+        }
+        
+        /* JUDUL SURAT */
+        .judul-surat {
+            text-align: center;
+            margin: 1rem 0 0.5rem 0;
+            text-transform: uppercase;
+            font-weight: bold;
+            text-decoration: underline;
+            font-size: 12pt;
+        }
+        
+        .nomor-surat {
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 10pt;
+        }
+        
+        /* CONTENT */
+        .content {
+            text-align: justify;
+            line-height: 1.6;
+        }
+        
+        .content p {
+            margin-bottom: 0.8rem;
+        }
+        
+        .content table {
             width: 100%;
+            margin-bottom: 0.8rem;
             border-collapse: collapse;
         }
         
-        .info-mahasiswa td {
-            padding: 5px 10px;
+        .content td {
             vertical-align: top;
+            padding: 0.15rem 0;
         }
         
-        .info-mahasiswa td:first-child {
-            width: 180px;
+        .content td.label {
+            width: 28%;
+        }
+        
+        .content td.sep {
+            width: 3%;
+        }
+        
+        .judul-skripsi {
+            margin: 0.5rem 0 0.8rem 1.5cm;
             font-weight: bold;
+            font-style: italic;
         }
         
-        .info-mahasiswa td:nth-child(2) {
-            width: 20px;
-            text-align: center;
-        }
-        
-        .konsultasi-section {
-            margin: 30px 0;
-        }
-        
-        .konsultasi-item {
-            margin-bottom: 30px;
-            border: 2px solid #dee2e6;
-            border-radius: 8px;
-            padding: 20px;
-            page-break-inside: avoid;
-            background-color: #fff;
-        }
-        
-        .konsultasi-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e9ecef;
-        }
-        
-        .konsultasi-number {
-            font-size: 14pt;
-            font-weight: bold;
-            color: #333;
-        }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 10pt;
-            text-align: center;
-        }
-        
-        .status-disetujui {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .status-revisi {
-            background-color: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeeba;
-        }
-        
-        .status-ditolak {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .status-menunggu {
-            background-color: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-        
-        .konsultasi-content {
-            margin: 15px 0;
-        }
-        
-        .konsultasi-label {
-            font-weight: bold;
-            margin-top: 12px;
-            margin-bottom: 5px;
-            color: #495057;
-        }
-        
-        .konsultasi-text {
+        .deskripsi-box {
+            margin: 0.5rem 0 0.8rem 1.5cm;
             text-align: justify;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-left: 4px solid #049D6F;
-            margin-bottom: 10px;
         }
         
-        .konsultasi-judul {
-            font-size: 13pt;
-            font-weight: bold;
-            color: #049D6F;
-            margin: 10px 0;
-        }
-        
-        .tanggal-info {
-            font-size: 10pt;
-            color: #6c757d;
-            font-style: italic;
-        }
-        
-        .tanggapan-dosen {
-            margin-top: 15px;
-            padding: 15px;
-            background-color: #e7f5f1;
-            border-left: 4px solid #049D6F;
-            border-radius: 5px;
-        }
-        
-        .no-data {
-            text-align: center;
-            padding: 40px;
-            color: #6c757d;
-            font-style: italic;
-            border: 2px dashed #dee2e6;
-            border-radius: 8px;
-            background-color: #f8f9fa;
-        }
-        
-        .signature-section {
-            margin-top: 50px;
+        /* TANDA TANGAN */
+        .ttd-container {
+            width: 100%;
+            margin-top: 1.5rem;
             page-break-inside: avoid;
         }
         
-        .signature-box {
+        .ttd-right {
+            width: 45%;
             float: right;
-            width: 300px;
-            text-align: center;
+            text-align: left;
         }
         
-        .signature-box p {
-            margin: 5px 0;
+        .ttd-right p {
+            margin: 0.2rem 0;
         }
         
-        .signature-line {
-            margin-top: 70px;
+        .ttd-space {
+            margin-top: 2.5rem;
+        }
+        
+        .ttd-nama {
             border-top: 1px solid #000;
-            padding-top: 5px;
+            padding-top: 0.3rem;
+            font-weight: bold;
         }
         
         .clearfix::after {
@@ -292,218 +257,169 @@ $tanggal_cetak = date('d F Y');
             clear: both;
         }
         
-        .button-container {
-            text-align: center;
-            margin: 30px 0;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-        }
-        
-        .btn {
-            display: inline-block;
-            padding: 12px 30px;
-            margin: 0 10px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            font-size: 11pt;
-            cursor: pointer;
-            border: none;
-            transition: all 0.3s;
-        }
-        
+        /* BUTTON CETAK (HANYA DI LAYAR) */
         .btn-print {
-            background-color: #049D6F;
-            color: white;
+            display: none;
         }
         
-        .btn-print:hover {
-            background-color: #037a59;
+        @media screen {
+            body {
+                background: #e5e7eb;
+                padding: 20px;
+            }
+            
+            .container {
+                background: #fff;
+                padding: 20mm;
+                box-shadow: 0 0 15px rgba(0,0,0,0.15);
+                margin: 20px auto;
+            }
+            
+            .btn-print {
+                display: block;
+                margin: 20px auto;
+                padding: 10px 24px;
+                background: #049D6F;
+                color: #fff;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 600;
+            }
+            
+            .btn-print:hover {
+                background: #037a59;
+            }
         }
         
-        .btn-back {
-            background-color: #6c757d;
-            color: white;
-        }
-        
-        .btn-back:hover {
-            background-color: #545b62;
-        }
-        
-        .summary-box {
-            background-color: #e7f5f1;
-            border: 2px solid #049D6F;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 20px 0;
-            text-align: center;
-        }
-        
-        .summary-box strong {
-            font-size: 13pt;
-            color: #049D6F;
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            
+            .btn-print {
+                display: none !important;
+            }
+            
+            .container {
+                width: 100%;
+                max-width: none;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Tombol Cetak & Kembali -->
-    <div class="button-container no-print">
-        <button onclick="window.print()" class="btn btn-print">🖨️ Cetak Dokumen</button>
-        <a href="detail_mahasiswa.php?nim=<?= urlencode($nim_mahasiswa); ?>" class="btn btn-back">← Kembali</a>
+
+<button class="btn-print" onclick="window.print()">🖨️ Cetak Dokumen</button>
+
+<div class="container">
+    <!-- KOP SURAT -->
+    <div class="kop-surat">
+        <div class="kop-logo-left">
+            <img src="assets/logo_uin.png" alt="Logo UIN">
+        </div>
+        <div class="kop-text">
+            <h3>KEMENTERIAN AGAMA REPUBLIK INDONESIA</h3>
+            <h4>UNIVERSITAS ISLAM NEGERI KOTA PALOPO</h4>
+            <h5>FAKULTAS SYARIAH</h5>
+            <p>Jl. Agatis, Balandai, Kota Palopo, Sulawesi Selatan 91922</p>
+            <p>Telp: (0471) 22978 | Website: www.uinpalopo.ac.id</p>
+        </div>
+        <div class="kop-logo-right">
+            <img src="assets/kemenag.png" alt="Logo Kemenag">
+        </div>
     </div>
 
-    <!-- Header Dokumen dengan Logo -->
-    <div class="header">
-        <div class="header-logo">
-            <!-- Ganti path logo sesuai dengan lokasi logo Anda -->
-            <img src="assets/logo_uin2.png" alt="Logo Universitas">
-        </div>
-        <div class="header-text">
-            <h1>Universitas Islam Negeri Kota Palopo</h1>
-            <h2>Riwayat Konsultasi Judul Penelitian</h2>
-            <p>Fakultas Syariah - Program Studi <?= htmlspecialchars($mahasiswa['nama_prodi']); ?></p>
-        </div>
+    <!-- JUDUL SURAT -->
+    <div class="judul-surat">
+        Surat Persetujuan Konsultasi Judul Skripsi
+    </div>
+    <div class="nomor-surat">
+        Nomor: &mdash;/F-SY/UIN-PAL/<?= date('Y'); ?>
     </div>
 
-    <!-- Informasi Mahasiswa -->
-    <div class="info-mahasiswa">
+    <!-- CONTENT -->
+    <div class="content">
+        <p>Yang bertanda tangan di bawah ini menyatakan bahwa judul skripsi mahasiswa berikut telah disetujui pada tahap konsultasi judul:</p>
+
         <table>
             <tr>
-                <td>Nama Mahasiswa</td>
-                <td>:</td>
-                <td><?= htmlspecialchars($mahasiswa['nama_mahasiswa']); ?></td>
+                <td class="label">Nama Mahasiswa</td>
+                <td class="sep">:</td>
+                <td><?= htmlspecialchars($data['nama_mahasiswa']); ?></td>
             </tr>
             <tr>
-                <td>NIM</td>
-                <td>:</td>
-                <td><?= htmlspecialchars($mahasiswa['nim']); ?></td>
+                <td class="label">NIM</td>
+                <td class="sep">:</td>
+                <td><?= htmlspecialchars($data['nim']); ?></td>
             </tr>
             <tr>
-                <td>Program Studi</td>
-                <td>:</td>
-                <td><?= htmlspecialchars($mahasiswa['nama_prodi']); ?></td>
-            </tr>
-
-            <tr>
-                <td>Dosen Pembimbing Akademik</td>
-                <td>:</td>
-                <td><?= htmlspecialchars($mahasiswa['nama_dosen']); ?></td>
-            </tr>
-            <tr>
-                <td>Tanggal Cetak</td>
-                <td>:</td>
-                <td><?= $tanggal_cetak; ?></td>
+                <td class="label">Program Studi</td>
+                <td class="sep">:</td>
+                <td><?= htmlspecialchars($nama_prodi); ?></td>
             </tr>
         </table>
-    </div>
 
-    <!-- Summary -->
-    <div class="summary-box">
-        <strong>Total Konsultasi: <?= $jumlah_konsultasi; ?> kali</strong>
-    </div>
+        <p>Adapun judul skripsi yang disetujui adalah:</p>
 
-    <!-- Riwayat Konsultasi -->
-    <div class="konsultasi-section">
-        <?php if ($jumlah_konsultasi > 0): ?>
-            <?php 
-            $nomor = 1;
-            while($konsul = $result_konsultasi->fetch_assoc()): 
-                // Tentukan kelas status
-                $status_class = 'status-menunggu';
-                $status_icon = '⏳';
-                if ($konsul['status'] == 'Disetujui') {
-                    $status_class = 'status-disetujui';
-                    $status_icon = '✅';
-                } elseif ($konsul['status'] == 'Ditolak') {
-                    $status_class = 'status-ditolak';
-                    $status_icon = '❌';
-                } elseif ($konsul['status'] == 'Revisi') {
-                    $status_class = 'status-revisi';
-                    $status_icon = '🔄';
-                }
-            ?>
-            
-            <div class="konsultasi-item">
-                <div class="konsultasi-header">
-                    <div class="konsultasi-number">Konsultasi ke-<?= $nomor; ?></div>
-                    <div class="status-badge <?= $status_class; ?>">
-                        <?= $status_icon; ?> <?= htmlspecialchars($konsul['status']); ?>
-                    </div>
-                </div>
-                
-                <div class="konsultasi-content">
-                    <p class="tanggal-info">
-                        📅 Tanggal Pengajuan: <?= date('d F Y, H:i', strtotime($konsul['tanggal_pengajuan'])); ?> WIB
-                    </p>
-                    
-                    <p class="konsultasi-label">Judul Usulan:</p>
-                    <div class="konsultasi-judul">
-                        "<?= htmlspecialchars($konsul['judul_usulan']); ?>"
-                    </div>
-                    
-                    <?php if (!empty($konsul['deskripsi'])): ?>
-                    <p class="konsultasi-label">Deskripsi / Latar Belakang:</p>
-                    <div class="konsultasi-text">
-                        <?= nl2br(htmlspecialchars($konsul['deskripsi'])); ?>
-                    </div>
-                    <?php endif; ?>
-                    
-                    <?php if (!empty($konsul['catatan_dosen'])): ?>
-                    <div class="tanggapan-dosen">
-                        <p class="konsultasi-label">💬 Tanggapan Dosen Pembimbing:</p>
-                        <div style="margin-top: 10px;">
-                            <?= nl2br(htmlspecialchars($konsul['catatan_dosen'])); ?>
-                        </div>
-                        <?php if (!empty($konsul['tanggal_respon'])): ?>
-                        <p class="tanggal-info" style="margin-top: 10px;">
-                            🕐 Ditanggapi pada: <?= date('d F Y, H:i', strtotime($konsul['tanggal_respon'])); ?> WIB
-                        </p>
-                        <?php endif; ?>
-                    </div>
-                    <?php elseif ($konsul['status'] == 'Menunggu'): ?>
-                    <div style="margin-top: 15px; padding: 10px; background-color: #fff3cd; border-left: 4px solid #ffc107; border-radius: 5px;">
-                        <p style="color: #856404; font-style: italic;">⏳ Menunggu tanggapan dari dosen pembimbing...</p>
-                    </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-            
-            <?php 
-            $nomor++;
-            endwhile; 
-            ?>
-            
-        <?php else: ?>
-            <div class="no-data">
-                <p style="font-size: 14pt;">📋 Belum ada riwayat konsultasi judul</p>
-                <p style="margin-top: 10px;">Mahasiswa belum mengajukan konsultasi judul penelitian</p>
-            </div>
+        <div class="judul-skripsi">
+            "<?= htmlspecialchars($data['judul_usulan']); ?>"
+        </div>
+
+        <?php if (!empty($data['deskripsi'])): ?>
+        <p>Dengan ringkasan/deskripsi sebagai berikut:</p>
+        <div class="deskripsi-box">
+            <?= nl2br(htmlspecialchars($data['deskripsi'])); ?>
+        </div>
         <?php endif; ?>
-    </div>
 
-    <!-- Tanda Tangan -->
-    <?php if ($jumlah_konsultasi > 0): ?>
-    <div class="signature-section clearfix">
-        <div class="signature-box">
-            <p><?= $tanggal_cetak; ?></p>
-            <p style="font-weight: bold; margin-top: 5px;">Dosen Pembimbing Akademik</p>
-            <div class="signature-line">
-                <p style="font-weight: bold;"><?= htmlspecialchars($mahasiswa['nama_dosen']); ?></p>
-                <?php if (!empty($mahasiswa['nip'])): ?>
-                <p>NIP. <?= htmlspecialchars($mahasiswa['nip']); ?></p>
-                <?php endif; ?>
+        <p>Catatan/tanggapan dosen pembimbing akademik (PA):</p>
+        <div class="deskripsi-box">
+            <?= nl2br(htmlspecialchars($catatan_dsn)); ?>
+        </div>
+
+        <table>
+            <tr>
+                <td class="label">Tanggal Pengajuan</td>
+                <td class="sep">:</td>
+                <td><?= $tgl_pengajuan; ?></td>
+            </tr>
+            <tr>
+                <td class="label">Tanggal Persetujuan</td>
+                <td class="sep">:</td>
+                <td><?= $tgl_respon; ?></td>
+            </tr>
+            <tr>
+                <td class="label">Status</td>
+                <td class="sep">:</td>
+                <td><?= htmlspecialchars($data['status']); ?></td>
+            </tr>
+        </table>
+
+        <p>Demikian surat persetujuan konsultasi judul skripsi ini dibuat untuk dapat dipergunakan sebagaimana mestinya serta sebagai dasar penetapan dosen pembimbing skripsi.</p>
+
+        <!-- TANDA TANGAN -->
+        <div class="ttd-container clearfix">
+            <div class="ttd-right">
+                <p>Palopo, <?= $tgl_respon !== '-' ? $tgl_respon : $tgl_pengajuan; ?></p>
+                <p>Dosen Pembimbing Akademik (PA)</p>
+                <div class="ttd-space"></div>
+                <p class="ttd-nama"><?= htmlspecialchars($nama_dosen); ?></p>
             </div>
         </div>
     </div>
-    <?php endif; ?>
+</div>
 
+<script>
+    window.addEventListener('load', function () {
+        // Auto print saat halaman dimuat (opsional, bisa dinonaktifkan)
+        // window.print();
+    });
+</script>
 </body>
 </html>
-
 <?php
-// Tutup koneksi
-if (isset($stmt_mhs)) $stmt_mhs->close();
-if (isset($stmt_konsul)) $stmt_konsul->close();
 $conn->close();
 ?>

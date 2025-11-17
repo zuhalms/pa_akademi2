@@ -7,60 +7,106 @@ $page_title = 'Dashboard Dosen';
 
 // Include config (otomatis deteksi XAMPP atau InfinityFree)
 require_once 'config.php';
-require 'templates/header.php';
 
-// Keamanan
-if (!isset($_SESSION['user_id'])) {
+// Keamanan: cek session SEBELUM output apa pun
+if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] ?? '') !== 'dosen') {
     header("Location: login.php");
     exit();
 }
 
-
-$id_dosen_login = $_SESSION['user_id'];
-
+// Paksa id dosen jadi integer supaya aman di query
+$id_dosen_login = (int) $_SESSION['user_id'];
 
 // === KUMPULKAN SEMUA DATA UNTUK DASHBOARD ===
-$total_mahasiswa_result = $conn->query("SELECT COUNT(nim) as total FROM mahasiswa WHERE id_dosen_pa = {$id_dosen_login}");
-$total_mahasiswa = $total_mahasiswa_result->fetch_assoc()['total'];
 
-$perlu_perhatian_result = $conn->query("SELECT COUNT(nim) as total FROM mahasiswa WHERE id_dosen_pa = {$id_dosen_login} AND (ipk < 2.75 OR status = 'Non-Aktif')");
-$perlu_perhatian = $perlu_perhatian_result->fetch_assoc()['total'];
+// Total mahasiswa bimbingan
+$total_mahasiswa_result = $conn->query(
+    sprintf(
+        "SELECT COUNT(nim) as total FROM mahasiswa WHERE id_dosen_pa = %d",
+        $id_dosen_login
+    )
+);
+$total_mahasiswa = $total_mahasiswa_result->fetch_assoc()['total'] ?? 0;
 
-// [MODIFIKASI] Gabungkan notifikasi logbook + konsultasi judul
-$notif_logbook_result = $conn->query("SELECT COUNT(DISTINCT nim_mahasiswa) as total FROM logbook WHERE id_dosen = {$id_dosen_login} AND pengisi = 'Mahasiswa' AND status_baca = 'Belum Dibaca'");
-$notif_logbook = $notif_logbook_result->fetch_assoc()['total'];
+// Mahasiswa yang perlu perhatian
+$perlu_perhatian_result = $conn->query(
+    sprintf(
+        "SELECT COUNT(nim) as total 
+         FROM mahasiswa 
+         WHERE id_dosen_pa = %d 
+           AND (ipk < 2.75 OR status = 'Non-Aktif')",
+        $id_dosen_login
+    )
+);
+$perlu_perhatian = $perlu_perhatian_result->fetch_assoc()['total'] ?? 0;
 
-// [KODE BARU] Hitung konsultasi judul yang belum ditanggapi
+// Notifikasi logbook
+$notif_logbook_result = $conn->query(
+    sprintf(
+        "SELECT COUNT(DISTINCT nim_mahasiswa) as total 
+         FROM logbook 
+         WHERE id_dosen = %d 
+           AND pengisi = 'Mahasiswa' 
+           AND status_baca = 'Belum Dibaca'",
+        $id_dosen_login
+    )
+);
+$notif_logbook = $notif_logbook_result->fetch_assoc()['total'] ?? 0;
+
+// Hitung konsultasi judul yang belum ditanggapi
 $notif_konsultasi_judul = 0;
-if($conn->query("SHOW TABLES LIKE 'konsultasi_judul'")->num_rows > 0) {
-    $notif_konsultasi_result = $conn->query("SELECT COUNT(*) as total FROM konsultasi_judul kj JOIN mahasiswa m ON kj.nim = m.nim WHERE m.id_dosen_pa = {$id_dosen_login} AND kj.status = 'Menunggu'");
-    $notif_konsultasi_judul = $notif_konsultasi_result->fetch_assoc()['total'];
+$cek_tabel_konsul = $conn->query("SHOW TABLES LIKE 'konsultasi_judul'");
+if ($cek_tabel_konsul && $cek_tabel_konsul->num_rows > 0) {
+    $notif_konsultasi_result = $conn->query(
+        sprintf(
+            "SELECT COUNT(*) as total 
+             FROM konsultasi_judul kj 
+             JOIN mahasiswa m ON kj.nim = m.nim 
+             WHERE m.id_dosen_pa = %d 
+               AND kj.status = 'Menunggu'",
+            $id_dosen_login
+        )
+    );
+    $notif_konsultasi_judul = $notif_konsultasi_result->fetch_assoc()['total'] ?? 0;
 }
 
-// [KODE BARU] Total notifikasi = logbook + konsultasi judul
+// Total notifikasi = logbook + konsultasi judul
 $total_notifikasi = $notif_logbook + $notif_konsultasi_judul;
 
-$mahasiswa_aktif_result = $conn->query("SELECT COUNT(nim) as total FROM mahasiswa WHERE id_dosen_pa = {$id_dosen_login} AND status = 'Aktif'");
-$mahasiswa_aktif = $mahasiswa_aktif_result->fetch_assoc()['total'];
+// Mahasiswa aktif
+$mahasiswa_aktif_result = $conn->query(
+    sprintf(
+        "SELECT COUNT(nim) as total 
+         FROM mahasiswa 
+         WHERE id_dosen_pa = %d 
+           AND status = 'Aktif'",
+        $id_dosen_login
+    )
+);
+$mahasiswa_aktif = $mahasiswa_aktif_result->fetch_assoc()['total'] ?? 0;
 
 // Data untuk Daftar Mahasiswa Bimbingan (dengan filter dan search)
 $params = [];
-$types = "";
+$types  = "";
 
-$sql_main = "SELECT nim, nama_mahasiswa, ipk, status, angkatan, krs_disetujui FROM mahasiswa WHERE id_dosen_pa = ?";
+$sql_main = "
+    SELECT nim, nama_mahasiswa, ipk, status, angkatan, krs_disetujui 
+    FROM mahasiswa 
+    WHERE id_dosen_pa = ?
+";
 $params[] = $id_dosen_login;
-$types .= "i";
+$types   .= "i";
 
 if (!empty($_GET['search'])) {
     $search_term = "%" . $_GET['search'] . "%";
-    $sql_main .= " AND (nama_mahasiswa LIKE ? OR nim LIKE ?)";
+    $sql_main   .= " AND (nama_mahasiswa LIKE ? OR nim LIKE ?)";
     array_push($params, $search_term, $search_term);
     $types .= "ss";
 }
 if (!empty($_GET['angkatan'])) {
     $sql_main .= " AND angkatan = ?";
-    $params[] = $_GET['angkatan'];
-    $types .= "i";
+    $params[]  = $_GET['angkatan'];
+    $types    .= "i";
 }
 $sql_main .= " ORDER BY nama_mahasiswa ASC";
 
@@ -75,17 +121,67 @@ if ($stmt_main) {
     $result_mahasiswa = $stmt_main->get_result();
 }
 
-$result_angkatan = $conn->query("SELECT DISTINCT angkatan FROM mahasiswa WHERE id_dosen_pa = {$id_dosen_login} ORDER BY angkatan DESC");
-$result_sidebar_logbook = $conn->query("SELECT m.nim, m.nama_mahasiswa FROM logbook l JOIN mahasiswa m ON l.nim_mahasiswa = m.nim WHERE l.id_dosen = {$id_dosen_login} AND l.pengisi = 'Mahasiswa' AND l.status_baca = 'Belum Dibaca' GROUP BY m.nim ORDER BY MAX(l.created_at) DESC LIMIT 5");
+// Angkatan
+$result_angkatan = $conn->query(
+    sprintf(
+        "SELECT DISTINCT angkatan 
+         FROM mahasiswa 
+         WHERE id_dosen_pa = %d 
+         ORDER BY angkatan DESC",
+        $id_dosen_login
+    )
+);
 
-// [KODE BARU] Ambil data konsultasi judul yang menunggu
+// Logbook sidebar
+$result_sidebar_logbook = $conn->query(
+    sprintf(
+        "SELECT m.nim, m.nama_mahasiswa 
+         FROM logbook l 
+         JOIN mahasiswa m ON l.nim_mahasiswa = m.nim 
+         WHERE l.id_dosen = %d 
+           AND l.pengisi = 'Mahasiswa' 
+           AND l.status_baca = 'Belum Dibaca'
+         GROUP BY m.nim 
+         ORDER BY MAX(l.created_at) DESC 
+         LIMIT 5",
+        $id_dosen_login
+    )
+);
+
+// Konsultasi judul sidebar
 $result_sidebar_konsultasi = null;
-if($conn->query("SHOW TABLES LIKE 'konsultasi_judul'")->num_rows > 0) {
-    $result_sidebar_konsultasi = $conn->query("SELECT kj.nim, m.nama_mahasiswa, kj.judul_usulan, kj.tanggal_pengajuan FROM konsultasi_judul kj JOIN mahasiswa m ON kj.nim = m.nim WHERE m.id_dosen_pa = {$id_dosen_login} AND kj.status = 'Menunggu' ORDER BY kj.tanggal_pengajuan DESC LIMIT 5");
+if ($cek_tabel_konsul && $cek_tabel_konsul->num_rows > 0) {
+    $result_sidebar_konsultasi = $conn->query(
+        sprintf(
+            "SELECT kj.nim, m.nama_mahasiswa, kj.judul_usulan, kj.tanggal_pengajuan 
+             FROM konsultasi_judul kj 
+             JOIN mahasiswa m ON kj.nim = m.nim 
+             WHERE m.id_dosen_pa = %d 
+               AND kj.status = 'Menunggu'
+             ORDER BY kj.tanggal_pengajuan DESC 
+             LIMIT 5",
+            $id_dosen_login
+        )
+    );
 }
 
-$result_sidebar_bermasalah = $conn->query("SELECT nim, nama_mahasiswa, ipk FROM mahasiswa WHERE id_dosen_pa = {$id_dosen_login} AND (ipk < 2.75 OR status = 'Non-Aktif') ORDER BY ipk ASC LIMIT 5");
+// Mahasiswa bermasalah sidebar
+$result_sidebar_bermasalah = $conn->query(
+    sprintf(
+        "SELECT nim, nama_mahasiswa, ipk 
+         FROM mahasiswa 
+         WHERE id_dosen_pa = %d 
+           AND (ipk < 2.75 OR status = 'Non-Aktif') 
+         ORDER BY ipk ASC 
+         LIMIT 5",
+        $id_dosen_login
+    )
+);
+
+// Panggil header SETELAH semua query & cek keamanan selesai
+require 'templates/header.php';
 ?>
+<!-- ======= DASHBOARD DOSEN CONTENT ======= -->
 
 <style>
     /* ========== IMPROVED STYLES ========== */

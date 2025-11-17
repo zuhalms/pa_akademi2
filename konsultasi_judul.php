@@ -3,7 +3,8 @@ $page_title = 'Konsultasi Judul';
 require_once 'config.php';
 require 'templates/header.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'mahasiswa') {
+// Cek akses mahasiswa
+if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] ?? '') !== 'mahasiswa') {
     header("Location: login.php");
     exit();
 }
@@ -21,6 +22,7 @@ $stmt = $conn->prepare("
 $stmt->bind_param("s", $nim);
 $stmt->execute();
 $result = $stmt->get_result();
+
 $konsultasi_list = [];
 while ($row = $result->fetch_assoc()) {
     $konsultasi_list[] = $row;
@@ -29,7 +31,7 @@ $stmt->close();
 
 // Notifikasi
 $success_message = $_SESSION['success'] ?? '';
-$error_message = $_SESSION['error'] ?? '';
+$error_message   = $_SESSION['error'] ?? '';
 unset($_SESSION['success'], $_SESSION['error']);
 ?>
 
@@ -122,12 +124,13 @@ unset($_SESSION['success'], $_SESSION['error']);
         border-radius: 2rem;
         font-size: 0.85rem;
         font-weight: 600;
+        white-space: nowrap;
     }
 
     .status-menunggu { background: #fef3c7; color: #92400e; }
     .status-disetujui { background: #d1fae5; color: #065f46; }
-    .status-ditolak { background: #fee2e2; color: #991b1b; }
-    .status-revisi { background: #dbeafe; color: #1e40af; }
+    .status-ditolak   { background: #fee2e2; color: #991b1b; }
+    .status-revisi    { background: #dbeafe; color: #1e40af; }
 
     .alert {
         border-radius: 0.75rem;
@@ -140,7 +143,7 @@ unset($_SESSION['success'], $_SESSION['error']);
 
     @keyframes slideInDown {
         from { opacity: 0; transform: translateY(-20px); }
-        to { opacity: 1; transform: translateY(0); }
+        to   { opacity: 1; transform: translateY(0); }
     }
 
     .alert-success {
@@ -214,19 +217,19 @@ unset($_SESSION['success'], $_SESSION['error']);
 
     <!-- NOTIFIKASI -->
     <?php if ($success_message): ?>
-    <div class="alert alert-success alert-dismissible fade show">
-        <i class="bi bi-check-circle-fill me-2"></i>
-        <?= htmlspecialchars($success_message); ?>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
-    </div>
+        <div class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <?= htmlspecialchars($success_message); ?>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+        </div>
     <?php endif; ?>
 
     <?php if ($error_message): ?>
-    <div class="alert alert-danger alert-dismissible fade show">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-        <?= htmlspecialchars($error_message); ?>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
-    </div>
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <?= htmlspecialchars($error_message); ?>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+        </div>
     <?php endif; ?>
 
     <div class="row">
@@ -234,7 +237,9 @@ unset($_SESSION['success'], $_SESSION['error']);
             <!-- FORM PENGAJUAN -->
             <div class="card">
                 <div class="card-header" style="background: linear-gradient(135deg, var(--campus-green) 0%, #037a59 100%); color: white; padding: 1.5rem;">
-                    <h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Ajukan Judul Baru</h5>
+                    <h5 class="mb-0">
+                        <i class="bi bi-plus-circle me-2"></i>Ajukan Judul Baru
+                    </h5>
                 </div>
                 <div class="card-body" style="padding: 2rem;">
                     <form action="submit_konsultasi_judul.php" method="POST">
@@ -242,15 +247,26 @@ unset($_SESSION['success'], $_SESSION['error']);
                             <label for="judul_usulan" class="form-label fw-bold">
                                 <i class="bi bi-pencil-square text-primary me-2"></i>Judul Usulan
                             </label>
-                            <input type="text" class="form-control" id="judul_usulan" name="judul_usulan" 
-                                   placeholder="Contoh: Sistem Informasi Akademik Berbasis Web" required>
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="judul_usulan"
+                                name="judul_usulan"
+                                placeholder="Contoh: Sistem Informasi Akademik Berbasis Web"
+                                required
+                            >
                         </div>
                         <div class="mb-3">
                             <label for="deskripsi" class="form-label fw-bold">
                                 <i class="bi bi-file-text text-success me-2"></i>Deskripsi/Latar Belakang
                             </label>
-                            <textarea class="form-control" id="deskripsi" name="deskripsi" rows="5" 
-                                      placeholder="Jelaskan latar belakang dan tujuan penelitian Anda..."></textarea>
+                            <textarea
+                                class="form-control"
+                                id="deskripsi"
+                                name="deskripsi"
+                                rows="5"
+                                placeholder="Jelaskan latar belakang dan tujuan penelitian Anda..."
+                            ></textarea>
                         </div>
                         <div class="d-flex justify-content-end">
                             <button type="submit" class="btn btn-primary">
@@ -261,61 +277,97 @@ unset($_SESSION['success'], $_SESSION['error']);
                 </div>
             </div>
 
-            <!-- RIWAYAT KONSULTASI -->
-            <div class="card">
-                <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem;">
-                    <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Riwayat Konsultasi</h5>
-                </div>
-                <div class="card-body" style="padding: 2rem;">
-                    <?php if (count($konsultasi_list) > 0): ?>
-                        <?php foreach ($konsultasi_list as $konsultasi): ?>
-                        <div class="konsultasi-item">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div class="flex-grow-1">
-                                    <h5 class="mb-2 fw-bold"><?= htmlspecialchars($konsultasi['judul_usulan']); ?></h5>
-                                    <p class="text-muted mb-2">
-                                        <i class="bi bi-calendar3"></i> 
-                                        <?= date('d F Y, H:i', strtotime($konsultasi['tanggal_pengajuan'])); ?> WIB
-                                    </p>
-                                </div>
-                                <span class="status-badge status-<?= strtolower($konsultasi['status']); ?>">
-                                    <?= $konsultasi['status']; ?>
-                                </span>
-                            </div>
+          <!-- RIWAYAT KONSULTASI -->
+<div class="card">
+    <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem;">
+        <h5 class="mb-0">
+            <i class="bi bi-clock-history me-2"></i>Riwayat Konsultasi
+        </h5>
+    </div>
+    <div class="card-body" style="padding: 2rem;">
+        <?php if (count($konsultasi_list) > 0): ?>
+            <?php foreach ($konsultasi_list as $konsultasi): ?>
+                <?php
+                    // Normalisasi status untuk class CSS (lowercase & ganti spasi jadi strip)
+                    $status_raw   = $konsultasi['status'] ?? '';
+                    $status_class = 'status-' . strtolower(str_replace(' ', '-', $status_raw));
 
-                            <?php if (!empty($konsultasi['deskripsi'])): ?>
-                            <div class="mb-3">
-                                <strong>Deskripsi:</strong>
-                                <p class="mb-0 mt-1"><?= nl2br(htmlspecialchars($konsultasi['deskripsi'])); ?></p>
-                            </div>
-                            <?php endif; ?>
+                    // Hanya boleh cetak jika status disetujui
+                    $status_upper = strtoupper(trim($status_raw));
+                    $boleh_cetak  = ($status_upper === 'DISETUJUI');
+                ?>
+                <div class="konsultasi-item">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="flex-grow-1">
+                            <h5 class="mb-2 fw-bold">
+                                <?= htmlspecialchars($konsultasi['judul_usulan']); ?>
+                            </h5>
+                            <p class="text-muted mb-2">
+                                <i class="bi bi-calendar3"></i>
+                                <?= date('d F Y, H:i', strtotime($konsultasi['tanggal_pengajuan'])); ?> WIB
+                            </p>
+                        </div>
+                        <span class="status-badge <?= $status_class; ?>">
+                            <?= htmlspecialchars($status_raw); ?>
+                        </span>
+                    </div>
 
-                            <?php if (!empty($konsultasi['catatan_dosen'])): ?>
-                            <div class="alert alert-info mb-0">
-                                <strong><i class="bi bi-chat-left-quote"></i> Tanggapan Dosen PA:</strong>
-                                <p class="mb-1 mt-2"><?= nl2br(htmlspecialchars($konsultasi['catatan_dosen'])); ?></p>
+                    <?php if (!empty($konsultasi['deskripsi'])): ?>
+                        <div class="mb-3">
+                            <strong>Deskripsi:</strong>
+                            <p class="mb-0 mt-1">
+                                <?= nl2br(htmlspecialchars($konsultasi['deskripsi'])); ?>
+                            </p>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if (!empty($konsultasi['catatan_dosen'])): ?>
+                        <div class="alert alert-info mb-0">
+                            <strong>
+                                <i class="bi bi-chat-left-quote"></i> Tanggapan Dosen PA:
+                            </strong>
+                            <p class="mb-1 mt-2">
+                                <?= nl2br(htmlspecialchars($konsultasi['catatan_dosen'])); ?>
+                            </p>
+                            <?php if (!empty($konsultasi['tanggal_respon'])): ?>
                                 <small class="text-muted">
-                                    <i class="bi bi-person"></i> <?= htmlspecialchars($konsultasi['nama_dosen'] ?? 'Dosen PA'); ?> - 
+                                    <i class="bi bi-person"></i>
+                                    <?= htmlspecialchars($konsultasi['nama_dosen'] ?? 'Dosen PA'); ?>
+                                    &mdash;
                                     <?= date('d F Y, H:i', strtotime($konsultasi['tanggal_respon'])); ?> WIB
                                 </small>
-                            </div>
+                            <?php else: ?>
+                                <small class="text-muted">
+                                    <i class="bi bi-person"></i>
+                                    <?= htmlspecialchars($konsultasi['nama_dosen'] ?? 'Dosen PA'); ?>
+                                </small>
                             <?php endif; ?>
                         </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <div class="empty-state">
-                            <i class="bi bi-inbox"></i>
-                            <h5 class="text-muted">Belum Ada Riwayat Konsultasi</h5>
-                            <p class="text-muted">Ajukan judul penelitian Anda di form di atas.</p>
+                    <?php endif; ?>
+
+                    <?php if ($boleh_cetak): ?>
+                        <div class="mt-3 d-flex justify-content-end">
+                            <a href="cetak_konsultasi_judul.php?id=<?= urlencode($konsultasi['id_konsultasi']); ?>"
+                               target="_blank"
+                               class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-printer"></i> Cetak Persetujuan
+                            </a>
                         </div>
                     <?php endif; ?>
                 </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <div class="empty-state">
+                <i class="bi bi-inbox"></i>
+                <h5 class="text-muted">Belum Ada Riwayat Konsultasi</h5>
+                <p class="text-muted">Ajukan judul penelitian Anda di form di atas.</p>
             </div>
-        </div>
+        <?php endif; ?>
     </div>
 </div>
 
-<?php 
+
+<?php
 $conn->close();
-require 'templates/footer.php'; 
+require 'templates/footer.php';
 ?>
