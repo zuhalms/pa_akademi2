@@ -13,22 +13,20 @@ $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $where  = "";
 if ($search !== '') {
     $search_esc = $conn->real_escape_string($search);
-    $where      = "WHERE m.nim LIKE '%$search_esc%' OR m.nama_mahasiswa LIKE '%$search_esc%'";
+    $where      = "WHERE kode_prodi LIKE '%$search_esc%' 
+                   OR nama_prodi LIKE '%$search_esc%'";
 }
 
 // Get total records
-$total_query  = "SELECT COUNT(*) as total FROM mahasiswa m $where";
+$total_query  = "SELECT COUNT(*) as total FROM program_studi $where";
 $total_result = $conn->query($total_query);
 $total_rows   = $total_result ? ($total_result->fetch_assoc()['total'] ?? 0) : 0;
 $total_pages  = $total_rows > 0 ? ceil($total_rows / $limit) : 1;
 
-// Get mahasiswa data with dosen PA & prodi
-$query = "SELECT m.*, d.nama_dosen, p.nama_prodi
-          FROM mahasiswa m
-          LEFT JOIN dosen d ON m.id_dosen_pa = d.id_dosen
-          LEFT JOIN program_studi p ON m.id_prodi = p.id_prodi
+// Get prodi data
+$query = "SELECT * FROM program_studi
           $where
-          ORDER BY m.nim ASC
+          ORDER BY nama_prodi ASC
           LIMIT $limit OFFSET $offset";
 
 $result = $conn->query($query);
@@ -44,7 +42,7 @@ unset($_SESSION['success'], $_SESSION['error']);
     <link rel="icon" type="image/png" href="../assets/logo_uin.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Mahasiswa - Admin SMART-BA</title>
+    <title>Program Studi - Admin SMART-BA</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
@@ -124,32 +122,32 @@ unset($_SESSION['success'], $_SESSION['error']);
                 </div>
             </div>
 
-                <ul class="nav flex-column">
-                    <li class="nav-item mb-2">
-                        <a class="nav-link text-white <?= basename($_SERVER['PHP_SELF']) == 'dashboard_admin.php' ? 'active' : ''; ?>" href="dashboard_admin.php">
-                            <i class="bi bi-speedometer2 me-2"></i>Dashboard
-                        </a>
-                    </li>
+            <ul class="nav flex-column">
+                <li class="nav-item mb-2">
+                    <a class="nav-link text-white <?= basename($_SERVER['PHP_SELF']) == 'dashboard_admin.php' ? 'active' : ''; ?>" href="dashboard_admin.php">
+                        <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                    </a>
+                </li>
 
-                    <li class="nav-item mt-3 mb-1">
-                        <span class="sidebar-section-title text-white-50 ms-1">Manajemen Data</span>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white <?= in_array(basename($_SERVER['PHP_SELF']), ['mahasiswa.php','mahasiswa_tambah.php','mahasiswa_edit.php']) ? 'active' : ''; ?>" href="mahasiswa.php">
-                            <i class="bi bi-people me-2"></i>Mahasiswa
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white <?= basename($_SERVER['PHP_SELF']) == 'dosen.php' ? 'active' : ''; ?>" href="dosen.php">
-                            <i class="bi bi-person-workspace me-2"></i>Dosen
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white <?= in_array(basename($_SERVER['PHP_SELF']), ['prodi.php','prodi_tambah.php','prodi_edit.php']) ? 'active' : ''; ?>" href="prodi.php">
-                            <i class="bi bi-journal-bookmark me-2"></i>Program Studi
-                        </a>
-                    </li>
-                                    <li class="nav-item mt-3 mb-1">
+                <li class="nav-item mt-3 mb-1">
+                    <span class="sidebar-section-title text-white-50 ms-1">Manajemen Data</span>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white <?= in_array(basename($_SERVER['PHP_SELF']), ['mahasiswa.php','mahasiswa_tambah.php','mahasiswa_edit.php']) ? 'active' : ''; ?>" href="mahasiswa.php">
+                        <i class="bi bi-people me-2"></i>Mahasiswa
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white <?= in_array(basename($_SERVER['PHP_SELF']), ['dosen.php','dosen_tambah.php','dosen_edit.php']) ? 'active' : ''; ?>" href="dosen.php">
+                        <i class="bi bi-person-workspace me-2"></i>Dosen
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white <?= in_array(basename($_SERVER['PHP_SELF']), ['prodi.php','prodi_tambah.php','prodi_edit.php']) ? 'active' : ''; ?>" href="prodi.php">
+                        <i class="bi bi-journal-bookmark me-2"></i>Program Studi
+                    </a>
+                </li>
+                                <li class="nav-item mt-3 mb-1">
                     <span class="sidebar-section-title text-white-50 ms-1">Export Data</span>
                 </li>
                 <li class="nav-item">
@@ -161,31 +159,31 @@ unset($_SESSION['success'], $_SESSION['error']);
                 <a class="nav-link text-white" href="export_dosen.php">
                     <i class="bi bi-file-earmark-spreadsheet me-2"></i>Export Dosen
                 </a>
-            </li>
-                    <li class="nav-item mt-3 mb-1">
-                        <span class="sidebar-section-title text-white-50 ms-1">Akun</span>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-danger" href="../logout.php">
-                            <i class="bi bi-box-arrow-right me-2"></i>Logout
-                        </a>
-                    </li>
-                </ul>
+                 </li>
 
+                <li class="nav-item mt-3 mb-1">
+                    <span class="sidebar-section-title text-white-50 ms-1">Akun</span>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-danger" href="../logout.php">
+                        <i class="bi bi-box-arrow-right me-2"></i>Logout
+                    </a>
+                </li>
+            </ul>
         </aside>
 
         <!-- Main Content -->
         <main class="col-md-10 col-lg-10 p-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div>
-                    <h2 class="page-title mb-1">Data Mahasiswa</h2>
+                    <h2 class="page-title mb-1">Program Studi</h2>
                     <p class="breadcrumb-text text-muted mb-0">
-                        Kelola data mahasiswa untuk mendukung pemantauan akademik di lingkungan kampus hijau.
+                        Kelola data jurusan/program studi yang digunakan oleh mahasiswa dan dosen.
                     </p>
                 </div>
                 <div>
-                    <a href="mahasiswa_tambah.php" class="btn btn-brand">
-                        <i class="bi bi-plus-circle me-2"></i>Tambah Mahasiswa
+                    <a href="prodi_tambah.php" class="btn btn-brand">
+                        <i class="bi bi-plus-circle me-2"></i>Tambah Prodi
                     </a>
                 </div>
             </div>
@@ -214,7 +212,7 @@ unset($_SESSION['success'], $_SESSION['error']);
                         </div>
                         <div class="col-md-4 text-md-end">
                             <small class="text-muted">
-                                Total data: <?= $total_rows; ?> mahasiswa
+                                Total data: <?= $total_rows; ?> prodi
                             </small>
                         </div>
                     </div>
@@ -224,7 +222,7 @@ unset($_SESSION['success'], $_SESSION['error']);
                     <form method="GET" class="row g-3 mb-3">
                         <div class="col-md-10">
                             <input type="text" class="form-control" name="search"
-                                   placeholder="Cari berdasarkan NIM atau Nama..."
+                                   placeholder="Cari berdasarkan kode atau nama prodi..."
                                    value="<?= htmlspecialchars($search); ?>">
                         </div>
                         <div class="col-md-2">
@@ -240,12 +238,8 @@ unset($_SESSION['success'], $_SESSION['error']);
                             <thead>
                                 <tr>
                                     <th>No</th>
-                                    <th>NIM</th>
-                                    <th>Nama</th>
-                                    <th>Email</th>
+                                    <th>Kode Prodi</th>
                                     <th>Nama Prodi</th>
-                                    <th>Angkatan</th>
-                                    <th>Dosen PA</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -255,23 +249,16 @@ unset($_SESSION['success'], $_SESSION['error']);
                                     <?php while ($row = $result->fetch_assoc()): ?>
                                         <tr>
                                             <td><?= $no++; ?></td>
-                                            <td><?= htmlspecialchars($row['nim']); ?></td>
-                                            <td><?= htmlspecialchars($row['nama_mahasiswa']); ?></td>
-                                            <td><?= htmlspecialchars($row['email_mahasiswa'] ?? $row['email'] ?? ''); ?></td>
-                                            <td><?= htmlspecialchars($row['nama_prodi'] ?? '-'); ?></td>
-                                            <td><?= htmlspecialchars($row['angkatan']); ?></td>
-                                            <td><?= htmlspecialchars($row['nama_dosen'] ?? '-'); ?></td>
+                                            <td><?= htmlspecialchars($row['kode_prodi'] ?? ''); ?></td>
+                                            <td><?= htmlspecialchars($row['nama_prodi']); ?></td>
                                             <td>
-                                                <a href="mahasiswa_edit.php?nim=<?= urlencode($row['nim']); ?>" class="btn btn-sm btn-warning">
+                                                <a href="prodi_edit.php?id=<?= urlencode($row['id_prodi']); ?>"
+                                                   class="btn btn-sm btn-warning">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
-                                                <a href="reset_password_mahasiswa.php?nim=<?= urlencode($row['nim']); ?>"
-                                                class="btn btn-sm btn-secondary"
-                                                onclick="return confirm('Yakin ingin mereset password mahasiswa ini ke NIM?')">
-                                                    <i class="bi bi-key"></i>
-                                                </a>
-                                                <a href="mahasiswa_hapus.php?nim=<?= urlencode($row['nim']); ?>" class="btn btn-sm btn-danger"
-                                                onclick="return confirm('Yakin ingin menghapus mahasiswa ini?')">
+                                                <a href="prodi_hapus.php?id=<?= urlencode($row['id_prodi']); ?>"
+                                                   class="btn btn-sm btn-danger"
+                                                   onclick="return confirm('Yakin ingin menghapus program studi ini?')">
                                                     <i class="bi bi-trash"></i>
                                                 </a>
                                             </td>
@@ -279,7 +266,7 @@ unset($_SESSION['success'], $_SESSION['error']);
                                     <?php endwhile; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="8" class="text-center">Tidak ada data mahasiswa</td>
+                                        <td colspan="4" class="text-center">Tidak ada data program studi</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>

@@ -2,6 +2,8 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
+session_start();
+
 // Include konfigurasi database (otomatis XAMPP atau InfinityFree)
 require_once 'config.php';
 
@@ -15,13 +17,14 @@ if (isset($_SESSION['user_id'])) {
     } elseif ($_SESSION['user_role'] == 'mahasiswa') {
         header("Location: dashboard_mahasiswa.php");
         exit();
+    } elseif ($_SESSION['user_role'] == 'admin') {
+        header("Location: admin/dashboard_admin.php");
+        exit();
     }
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // $conn sudah siap dari config.php (otomatis XAMPP atau InfinityFree)
-    
-    $role = $_POST['role'] ?? '';
+    $role     = $_POST['role'] ?? '';
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
 
@@ -29,7 +32,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username_clean = str_replace(' ', '', $username);
 
     if ($role == 'dosen') {
-        // Query untuk dosen dengan REPLACE untuk menghilangkan spasi
         $stmt = $conn->prepare("SELECT id_dosen, nama_dosen, password FROM dosen WHERE REPLACE(nidn_dosen, ' ', '') = ?");
         $stmt->bind_param("s", $username_clean);
         $stmt->execute();
@@ -38,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($result->num_rows === 1) {
             $dosen = $result->fetch_assoc();
             if (password_verify($password, $dosen['password'])) {
-                $_SESSION['user_id'] = $dosen['id_dosen'];
+                $_SESSION['user_id']   = $dosen['id_dosen'];
                 $_SESSION['user_name'] = $dosen['nama_dosen'];
                 $_SESSION['user_role'] = 'dosen';
                 header("Location: dashboard_dosen.php");
@@ -46,9 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
         $stmt->close();
-        
+
     } elseif ($role == 'mahasiswa') {
-        // Query untuk mahasiswa dengan REPLACE untuk menghilangkan spasi
         $stmt = $conn->prepare("SELECT nim, nama_mahasiswa, password FROM mahasiswa WHERE REPLACE(nim, ' ', '') = ?");
         $stmt->bind_param("s", $username_clean);
         $stmt->execute();
@@ -57,11 +58,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($result->num_rows === 1) {
             $mahasiswa = $result->fetch_assoc();
             if (password_verify($password, $mahasiswa['password'])) {
-                // Simpan NIM asli (dengan spasi jika ada) ke session
-                $_SESSION['user_id'] = $mahasiswa['nim'];
+                $_SESSION['user_id']   = $mahasiswa['nim'];
                 $_SESSION['user_name'] = $mahasiswa['nama_mahasiswa'];
                 $_SESSION['user_role'] = 'mahasiswa';
                 header("Location: dashboard_mahasiswa.php");
+                exit();
+            }
+        }
+        $stmt->close();
+
+    } elseif ($role == 'admin') {
+        $stmt = $conn->prepare("SELECT id_admin, username_admin, nama_admin, password FROM admin WHERE username_admin = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 1) {
+            $admin = $result->fetch_assoc();
+            if (password_verify($password, $admin['password'])) {
+                $_SESSION['user_id']   = $admin['id_admin'];
+                $_SESSION['user_name'] = $admin['nama_admin'];
+                $_SESSION['user_role'] = 'admin';
+                header("Location: admin/dashboard_admin.php");
                 exit();
             }
         }
@@ -72,7 +90,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $error_message = "Kredensial yang Anda masukkan salah.";
 }
 
-// Tutup koneksi (opsional, karena PHP otomatis menutupnya)
 if (isset($conn)) {
     $conn->close();
 }
@@ -115,45 +132,56 @@ if (isset($conn)) {
             flex-basis: 45%;
             background: linear-gradient(135deg, #00A86B, #008F5A);
             color: white;
-            padding: 4rem 2rem;
+            padding: 3rem 2rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
-        .login-art .icon { 
-            font-size: 3.5rem; 
-            margin-bottom: 1rem; 
+        .login-art-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
         }
-        .login-art h2 { 
-            font-weight: 700; 
-            margin-bottom: 0.5rem; 
+        .login-art-header img {
+            height: 40px;
+            width: auto;
         }
-        .login-art p { 
-            font-size: 0.9rem; 
-            opacity: 0.9; 
+        .login-art .brand-title {
+            font-weight: 700;
+            font-size: 1.4rem;
         }
-        .feature-list { 
-            list-style: none; 
-            padding: 0; 
-            margin-top: 2rem; 
+        .login-art .brand-subtitle {
+            font-size: 0.85rem;
+            opacity: 0.9;
         }
-        .feature-list li { 
-            margin-bottom: 0.75rem; 
-            display: flex; 
-            align-items: center; 
+        .login-art p {
+            font-size: 0.9rem;
+            opacity: 0.9;
         }
-        .feature-list i { 
-            margin-right: 0.75rem; 
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 1.75rem;
+        }
+        .feature-list li {
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+        .feature-list i {
+            margin-right: 0.75rem;
         }
         
         .login-form-container {
             flex-basis: 55%;
             padding: 3rem;
         }
-        .role-selector { 
-            display: flex; 
-            gap: 1rem; 
-            margin-bottom: 1.5rem; 
+        .role-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
         .role-selector .role-btn {
             flex: 1;
@@ -165,6 +193,7 @@ if (isset($conn)) {
             transition: all 0.2s ease-in-out;
             text-decoration: none;
             color: #333;
+            font-size: 0.9rem;
         }
         .role-selector .role-btn.active {
             background-color: #00A86B;
@@ -172,8 +201,8 @@ if (isset($conn)) {
             border-color: #00A86B;
             font-weight: 600;
         }
-        .role-selector .role-btn:hover:not(.active) { 
-            background-color: #f8f9fa; 
+        .role-selector .role-btn:hover:not(.active) {
+            background-color: #f8f9fa;
         }
 
         .btn-brand {
@@ -190,11 +219,12 @@ if (isset($conn)) {
         }
         
         @media (max-width: 768px) {
-            .login-art { 
-                display: none; 
+            .login-art {
+                display: none;
             }
-            .login-form-container { 
-                flex-basis: 100%; 
+            .login-form-container {
+                flex-basis: 100%;
+                padding: 2.25rem 1.75rem;
             }
         }
     </style>
@@ -203,21 +233,28 @@ if (isset($conn)) {
     <div class="main-container">
         <div class="login-wrapper">
             <div class="login-art">
-                <i class="bi bi-bank icon"></i>
-                <h2>SMART-BA</h2>
-                <p>Sistem Manajemen Akademik dan Bimbingan Terpadu</p>
-                <p class="mt-2" style="font-size: 0.8rem;">Fakultas Syariah <br>Universitas Islam Negeri Kota Palopo</p>
+                <div class="login-art-header">
+                    <img src="assets/logo_uin.png" alt="Logo UIN">
+                    <div>
+                        <div class="brand-title">SMART-BA</div>
+                        <div class="brand-subtitle">Fakultas Syariah</div>
+                    </div>
+                </div>
+                <p>Sistem Manajemen Akademik dan Bimbingan Terpadu berbasis kampus hijau dan cerdas.</p>
+                <p class="mt-2" style="font-size: 0.8rem;">
+                    Universitas Islam Negeri Kota Palopo
+                </p>
                 <ul class="feature-list">
-                    <li><i class="bi bi-check-circle-fill"></i> Multi-Role Access</li>
-                    <li><i class="bi bi-check-circle-fill"></i> Digital Logbook</li>
-                    <li><i class="bi bi-check-circle-fill"></i> Real-time Analytics</li>
-                    <li><i class="bi bi-check-circle-fill"></i> Secure & Reliable</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Multi-Role Access (Admin, Dosen, Mahasiswa)</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Digital Logbook & Monitoring Bimbingan</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Integrasi data prodi & dosen PA</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Aman dengan enkripsi password</li>
                 </ul>
             </div>
             <div class="login-form-container">
                 <div>
-                    <h3 class="fw-bold">Selamat Datang!</h3>
-                    <p class="text-muted mb-4">Silakan login untuk melanjutkan</p>
+                    <h3 class="fw-bold mb-1">Selamat Datang</h3>
+                    <p class="text-muted mb-4">Silakan login sesuai peran Anda di SMART-BA.</p>
                     
                     <?php if ($error_message): ?>
                         <div class="alert alert-danger" role="alert">
@@ -229,11 +266,23 @@ if (isset($conn)) {
                         <div class="mb-3">
                             <label class="form-label">Login Sebagai:</label>
                             <div class="role-selector">
-                                <a href="#" class="role-btn active" data-role="mahasiswa" data-label="NIM" data-placeholder="Masukkan NIM tanpa spasi">
+                                <a href="#" class="role-btn active"
+                                   data-role="mahasiswa"
+                                   data-label="NIM"
+                                   data-placeholder="Masukkan NIM tanpa spasi">
                                     <i class="bi bi-person-fill me-2"></i>Mahasiswa
                                 </a>
-                                <a href="#" class="role-btn" data-role="dosen" data-label="ID Dosen" data-placeholder="Masukkan ID Dosen PA tanpa spasi">
+                                <a href="#" class="role-btn"
+                                   data-role="dosen"
+                                   data-label="ID Dosen"
+                                   data-placeholder="Masukkan ID Dosen PA tanpa spasi">
                                     <i class="bi bi-person-workspace me-2"></i>Dosen PA
+                                </a>
+                                <a href="#" class="role-btn"
+                                   data-role="admin"
+                                   data-label="Username Admin"
+                                   data-placeholder="Masukkan Username Admin">
+                                    <i class="bi bi-shield-lock-fill me-2"></i>Admin
                                 </a>
                             </div>
                             <input type="hidden" id="role" name="role" value="mahasiswa">
@@ -241,12 +290,21 @@ if (isset($conn)) {
 
                         <div class="mb-3">
                             <label for="username" id="username-label" class="form-label">NIM</label>
-                            <input type="text" class="form-control" id="username" name="username" placeholder="Masukkan NIM tanpa spasi" required>
+                            <input type="text" class="form-control" id="username" name="username"
+                                   placeholder="Masukkan NIM tanpa spasi" required>
                         </div>
+
                         <div class="mb-4">
                             <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan Password Anda" required>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" name="password"
+                                       placeholder="Masukkan Password Anda" required>
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                    <i class="bi bi-eye" id="togglePasswordIcon"></i>
+                                </button>
+                            </div>
                         </div>
+
                         <div class="d-grid mb-3">
                             <button type="submit" class="btn btn-brand">Masuk</button>
                         </div>
@@ -261,8 +319,8 @@ if (isset($conn)) {
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const roleButtons = document.querySelectorAll('.role-btn');
-            const roleInput = document.getElementById('role');
+            const roleButtons   = document.querySelectorAll('.role-btn');
+            const roleInput     = document.getElementById('role');
             const usernameLabel = document.getElementById('username-label');
             const usernameInput = document.getElementById('username');
 
@@ -276,6 +334,23 @@ if (isset($conn)) {
                     usernameLabel.textContent = this.dataset.label;
                     usernameInput.placeholder = this.dataset.placeholder;
                 });
+            });
+
+            // Toggle show/hide password
+            const passwordInput = document.getElementById('password');
+            const toggleBtn     = document.getElementById('togglePassword');
+            const toggleIcon    = document.getElementById('togglePasswordIcon');
+
+            toggleBtn.addEventListener('click', function () {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                if (type === 'text') {
+                    toggleIcon.classList.remove('bi-eye');
+                    toggleIcon.classList.add('bi-eye-slash');
+                } else {
+                    toggleIcon.classList.remove('bi-eye-slash');
+                    toggleIcon.classList.add('bi-eye');
+                }
             });
         });
     </script>

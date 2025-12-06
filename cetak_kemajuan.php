@@ -226,7 +226,7 @@ if (file_exists('templates/report_footer.php')) {
 
 // Output PDF
 $filename = 'Laporan_Kemajuan_Studi_' . htmlspecialchars($nim) . '_' . date('Y-m-d') . '.pdf';
-$pdf->Output('D', $filename);
+$pdf->Output('I', $filename);
 
 // Tutup koneksi
 $conn->close();

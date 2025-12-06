@@ -181,7 +181,6 @@ $result_sidebar_bermasalah = $conn->query(
 // Panggil header SETELAH semua query & cek keamanan selesai
 require 'templates/header.php';
 ?>
-<!-- ======= DASHBOARD DOSEN CONTENT ======= -->
 
 <style>
     /* ========== IMPROVED STYLES ========== */

@@ -3,71 +3,78 @@ session_start();
 require_once '../config.php';
 require_once 'auth_check.php';
 
-$error_message = '';
+// Ambil NIM dari URL
+if (!isset($_GET['nim'])) {
+    header("Location: mahasiswa.php");
+    exit();
+}
+
+$nim = $_GET['nim'];
+
+// Ambil data mahasiswa
+$stmt = $conn->prepare("SELECT * FROM mahasiswa WHERE nim = ?");
+$stmt->bind_param("s", $nim);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows !== 1) {
+    $_SESSION['error'] = "Data mahasiswa tidak ditemukan.";
+    header("Location: mahasiswa.php");
+    exit();
+}
+
+$mahasiswa = $result->fetch_assoc();
+$stmt->close();
 
 // Ambil daftar prodi
-$prodi_query  = "SELECT id_prodi, nama_prodi FROM program_studi ORDER BY nama_prodi ASC";
-$prodi_result = $conn->query($prodi_query);
+$prodi_result = $conn->query("SELECT id_prodi, nama_prodi FROM program_studi ORDER BY nama_prodi ASC");
 
-// Ambil list dosen untuk dropdown
-$dosen_query  = "SELECT id_dosen, nama_dosen, nidn_dosen FROM dosen ORDER BY nama_dosen ASC";
-$dosen_result = $conn->query($dosen_query);
+// Ambil daftar dosen
+$dosen_result = $conn->query("SELECT id_dosen, nama_dosen, nidn_dosen FROM dosen ORDER BY nama_dosen ASC");
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $nim       = trim($_POST['nim']);
-    $nama      = trim($_POST['nama_mahasiswa']);
-    $email     = trim($_POST['email']);
-    $telepon   = trim($_POST['telepon_mahasiswa']);
-    $id_prodi  = $_POST['id_prodi'] ?? '';
-    $angkatan  = trim($_POST['angkatan']);
-    $id_dosen  = $_POST['id_dosen'] != '' ? $_POST['id_dosen'] : NULL;
-    $alamat    = trim($_POST['alamat']);
+// Proses update
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $nama        = trim($_POST['nama_mahasiswa']);
+    $email       = trim($_POST['email_mahasiswa']);
+    $angkatan    = trim($_POST['angkatan']);
+    $id_prodi    = $_POST['id_prodi'] !== '' ? $_POST['id_prodi'] : null;
+    $id_dosen_pa = $_POST['id_dosen_pa'] !== '' ? $_POST['id_dosen_pa'] : null;
 
-    // Validasi
-    if (empty($nim) || empty($nama) || empty($email) || empty($id_prodi) || empty($angkatan)) {
-        $error_message = "Semua field wajib diisi kecuali telepon, dosen PA, dan alamat!";
+    if ($nama === '' || $email === '' || $angkatan === '') {
+        $_SESSION['error'] = "Nama, email, dan angkatan wajib diisi.";
     } else {
-        // Cek NIM sudah ada atau belum
-        $check_query = "SELECT nim FROM mahasiswa WHERE nim = ?";
-        $stmt = $conn->prepare($check_query);
-        $stmt->bind_param("s", $nim);
-        $stmt->execute();
-        $check_result = $stmt->get_result();
+        $update = $conn->prepare("
+            UPDATE mahasiswa 
+            SET nama_mahasiswa = ?, email = ?, angkatan = ?, id_prodi = ?, id_dosen_pa = ?
+            WHERE nim = ?
+        ");
+        $update->bind_param(
+            "sssiss",
+            $nama,
+            $email,
+            $angkatan,
+            $id_prodi,
+            $id_dosen_pa,
+            $nim
+        );
 
-        if ($check_result->num_rows > 0) {
-            $error_message = "NIM sudah terdaftar!";
+        if ($update->execute()) {
+            $_SESSION['success'] = "Data mahasiswa berhasil diperbarui.";
+            $update->close();
+            header("Location: mahasiswa.php");
+            exit();
         } else {
-            // Hash password (default = NIM)
-            $password = password_hash($nim, PASSWORD_DEFAULT);
-
-            // Insert data (menggunakan id_prodi)
-            $insert_query = "INSERT INTO mahasiswa 
-                (nim, nama_mahasiswa, email, telepon_mahasiswa, id_prodi, angkatan, id_dosen_pa, alamat, password) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            $stmt = $conn->prepare($insert_query);
-            $stmt->bind_param(
-                "sssssiiss",
-                $nim,
-                $nama,
-                $email,
-                $telepon,
-                $id_prodi,
-                $angkatan,
-                $id_dosen,
-                $alamat,
-                $password
-            );
-
-            if ($stmt->execute()) {
-                $_SESSION['success'] = "Mahasiswa berhasil ditambahkan! Password default: NIM";
-                header("Location: mahasiswa.php");
-                exit();
-            } else {
-                $error_message = "Gagal menambahkan mahasiswa: " . $stmt->error;
-            }
+            $_SESSION['error'] = "Gagal memperbarui data: " . $update->error;
+            $update->close();
         }
-        $stmt->close();
     }
+
+    // Refresh data mahasiswa dari POST agar form tetap menampilkan input terakhir
+    $mahasiswa['nama_mahasiswa']  = $nama;
+    $mahasiswa['email']           = $email;
+    $mahasiswa['angkatan']        = $angkatan;
+    $mahasiswa['id_prodi']        = $id_prodi;
+    $mahasiswa['id_dosen_pa']     = $id_dosen_pa;
 }
 ?>
 <!DOCTYPE html>
@@ -75,8 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <link rel="icon" type="image/png" href="../assets/logo_uin.png">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Mahasiswa - Admin SMART-BA</title>
+    <title>Edit Mahasiswa - Admin SMART-BA</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
@@ -191,9 +197,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <main class="col-md-10 col-lg-10 p-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div>
-                    <h2 class="page-title mb-1">Tambah Mahasiswa</h2>
+                    <h2 class="page-title mb-1">Edit Mahasiswa</h2>
                     <p class="breadcrumb-text text-muted mb-0">
-                        Tambahkan data mahasiswa baru untuk sistem pembimbingan akademik.
+                        Perbarui data mahasiswa untuk menjaga informasi akademik tetap akurat.
                     </p>
                 </div>
                 <div>
@@ -203,96 +209,80 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
             </div>
 
-            <?php if ($error_message): ?>
+            <?php if (!empty($_SESSION['error'])): ?>
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <?= htmlspecialchars($error_message); ?>
+                    <?= htmlspecialchars($_SESSION['error']); ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
+                <?php unset($_SESSION['error']); ?>
             <?php endif; ?>
 
             <div class="card section-card">
                 <div class="card-header bg-white">
                     <h6 class="mb-0">
-                        <i class="bi bi-person-plus me-2 text-success"></i>Form Tambah Mahasiswa
+                        <i class="bi bi-pencil-square me-2 text-success"></i>Form Edit Mahasiswa
                     </h6>
                 </div>
                 <div class="card-body">
                     <form method="POST" class="row g-3">
                         <div class="col-md-6">
-                            <label for="nim" class="form-label">NIM <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="nim" name="nim" required
-                                   value="<?= isset($_POST['nim']) ? htmlspecialchars($_POST['nim']) : ''; ?>">
-                            <small class="text-muted">Tanpa spasi, digunakan juga sebagai password awal.</small>
+                            <label class="form-label">NIM</label>
+                            <input type="text" class="form-control"
+                                   value="<?= htmlspecialchars($mahasiswa['nim']); ?>" disabled>
                         </div>
                         <div class="col-md-6">
-                            <label for="nama_mahasiswa" class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="nama_mahasiswa" name="nama_mahasiswa" required
-                                   value="<?= isset($_POST['nama_mahasiswa']) ? htmlspecialchars($_POST['nama_mahasiswa']) : ''; ?>">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control" id="email" name="email" required
-                                   value="<?= isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="telepon_mahasiswa" class="form-label">Telepon</label>
-                            <input type="text" class="form-control" id="telepon_mahasiswa" name="telepon_mahasiswa"
-                                   value="<?= isset($_POST['telepon_mahasiswa']) ? htmlspecialchars($_POST['telepon_mahasiswa']) : ''; ?>">
+                            <label class="form-label">Nama Mahasiswa</label>
+                            <input type="text" name="nama_mahasiswa" class="form-control"
+                                   value="<?= htmlspecialchars($mahasiswa['nama_mahasiswa']); ?>" required>
                         </div>
 
                         <div class="col-md-6">
-                            <label for="id_prodi" class="form-label">Program Studi <span class="text-danger">*</span></label>
-                            <select class="form-select" id="id_prodi" name="id_prodi" required>
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email_mahasiswa" class="form-control"
+                                   value="<?= htmlspecialchars($mahasiswa['email']); ?>" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Angkatan</label>
+                            <input type="text" name="angkatan" class="form-control"
+                                   value="<?= htmlspecialchars($mahasiswa['angkatan']); ?>" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Program Studi</label>
+                            <select name="id_prodi" class="form-select">
                                 <option value="">-- Pilih Prodi --</option>
                                 <?php if ($prodi_result && $prodi_result->num_rows > 0): ?>
                                     <?php while ($prodi = $prodi_result->fetch_assoc()): ?>
                                         <option value="<?= $prodi['id_prodi']; ?>"
-                                            <?= (($_POST['id_prodi'] ?? '') == $prodi['id_prodi']) ? 'selected' : ''; ?>>
+                                            <?= ($mahasiswa['id_prodi'] == $prodi['id_prodi']) ? 'selected' : ''; ?>>
                                             <?= htmlspecialchars($prodi['nama_prodi']); ?>
                                         </option>
                                     <?php endwhile; ?>
                                 <?php endif; ?>
                             </select>
                         </div>
-                        <div class="col-md-6">
-                            <label for="angkatan" class="form-label">Angkatan <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="angkatan" name="angkatan" required
-                                   placeholder="Contoh: 2023"
-                                   value="<?= isset($_POST['angkatan']) ? htmlspecialchars($_POST['angkatan']) : ''; ?>">
-                        </div>
 
                         <div class="col-md-6">
-                            <label for="id_dosen" class="form-label">Dosen Pembimbing Akademik (PA)</label>
-                            <select class="form-select" id="id_dosen" name="id_dosen">
+                            <label class="form-label">Dosen PA</label>
+                            <select name="id_dosen_pa" class="form-select">
                                 <option value="">-- Pilih Dosen PA --</option>
                                 <?php if ($dosen_result && $dosen_result->num_rows > 0): ?>
                                     <?php while ($dosen = $dosen_result->fetch_assoc()): ?>
                                         <option value="<?= $dosen['id_dosen']; ?>"
-                                            <?= (($_POST['id_dosen'] ?? '') == $dosen['id_dosen']) ? 'selected' : ''; ?>>
-                                            <?= htmlspecialchars($dosen['nama_dosen']); ?> (<?= htmlspecialchars($dosen['nidn_dosen']); ?>)
+                                            <?= ($mahasiswa['id_dosen_pa'] == $dosen['id_dosen']) ? 'selected' : ''; ?>>
+                                            <?= htmlspecialchars($dosen['nama_dosen']); ?>
+                                            (<?= htmlspecialchars($dosen['nidn_dosen']); ?>)
                                         </option>
                                     <?php endwhile; ?>
                                 <?php endif; ?>
                             </select>
                         </div>
 
-                        <div class="col-md-6">
-                            <label for="alamat" class="form-label">Alamat</label>
-                            <textarea class="form-control" id="alamat" name="alamat" rows="3"><?= isset($_POST['alamat']) ? htmlspecialchars($_POST['alamat']) : ''; ?></textarea>
-                        </div>
-
-                        <div class="col-12">
-                            <div class="alert alert-info mb-0">
-                                <i class="bi bi-info-circle me-2"></i>
-                                Password awal mahasiswa adalah <strong>NIM</strong> yang telah di-hash. Mahasiswa dapat mengganti password setelah login.
-                            </div>
-                        </div>
-
-                        <div class="col-12 d-grid mt-2">
+                        <div class="col-12 mt-3">
                             <button type="submit" class="btn btn-brand">
-                                <i class="bi bi-save me-2"></i>Simpan Mahasiswa
+                                <i class="bi bi-save me-2"></i>Simpan Perubahan
                             </button>
+                            <a href="mahasiswa.php" class="btn btn-secondary ms-2">Batal</a>
                         </div>
                     </form>
                 </div>
@@ -304,6 +294,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-<?php
-$conn->close();
-?>

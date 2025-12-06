@@ -468,7 +468,7 @@ $pdf->MultiCell(170, 5, $summary_text, 0, 'C');
 $filename = 'Laporan_Kemajuan_' . htmlspecialchars($mahasiswa['nim']) . '_' . date('Y-m-d') . '.pdf';
 
 // Gunakan 'I' untuk tampil di browser, atau 'D' untuk download
-$pdf->Output('D', $filename);
+$pdf->Output('I', $filename);
 
 // Tutup koneksi
 $conn->close();
